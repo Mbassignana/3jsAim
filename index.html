@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3jsAim - FPS Game (Canvas 2D Version)</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98D8E8 100%);
+        }
+        
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        #crosshair::before,
+        #crosshair::after {
+            content: '';
+            position: absolute;
+            background: #fff;
+        }
+        
+        #crosshair::before {
+            top: 50%;
+            left: 2px;
+            right: 2px;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+        
+        #crosshair::after {
+            left: 50%;
+            top: 2px;
+            bottom: 2px;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+        
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+        
+        #menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            color: #fff;
+            pointer-events: all;
+        }
+        
+        #menu h1 {
+            margin: 0 0 30px 0;
+            font-size: 48px;
+            color: #ff6b00;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        #menu button {
+            background: #ff6b00;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        
+        #menu button:hover {
+            background: #ff8533;
+        }
+        
+        #endScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            color: #fff;
+            pointer-events: all;
+            display: none;
+        }
+        
+        #endScreen h2 {
+            margin: 0 0 20px 0;
+            font-size: 36px;
+            color: #ff6b00;
+        }
+        
+        #finalScore {
+            font-size: 28px;
+            margin: 20px 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .game-playing {
+            cursor: none !important;
+        }
+        
+        .game-playing * {
+            cursor: none !important;
+        }
+        
+        #debug {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 12px;
+            z-index: 200;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div id="crosshair" class="hidden"></div>
+            <div id="score" class="hidden">Score: 0</div>
+            <div id="timer" class="hidden">Time: 2:00</div>
+            <div id="debug"></div>
+        </div>
+        
+        <div id="menu">
+            <h1>3jsAim</h1>
+            <p>First-Person Shooter (Canvas 2D Raycasting)</p>
+            <button onclick="startGame()">Start Game</button>
+            <div style="margin-top: 20px; font-size: 14px; color: #ccc;">
+                <p>Controls: WASD to move, Mouse to look around, Click to shoot</p>
+                <p>Shoot circles (+10 points), Avoid shooting animals (-1 point)</p>
+                <p style="color: #ff6b00;">Note: Using 2D Canvas raycasting (no external libraries)</p>
+            </div>
+        </div>
+        
+        <div id="endScreen">
+            <h2>Game Over!</h2>
+            <div id="finalScore">Final Score: 0</div>
+            <button onclick="restartGame()">Start New Game</button>
+        </div>
+    </div>
+
+    <script>
+        // Canvas 2D Raycasting FPS Game
+        class CanvasFPSGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.setupCanvas();
+                
+                // Game state
+                this.gameState = 'menu';
+                this.gameTime = 120;
+                this.score = 0;
+                this.isRunning = false;
+                
+                // Player
+                this.player = {
+                    x: 512, // Dead center of 16x16 map (8 * 64)
+                    y: 512,
+                    angle: 0,
+                    pitch: 0, // Vertical look angle
+                    speed: 0.1,
+                    turnSpeed: 0.03
+                };
+                
+                // Movement keys
+                this.keys = {};
+                this.mouse = { x: 0, y: 0, sensitivity: 0.002 };
+                
+                // World map (1 = wall, 0 = empty, 2 = building)
+                this.map = [
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,2,2,0,0,0,0,0,0,2,2,2,0,0,1],
+                    [1,0,2,2,0,0,0,0,0,0,0,0,2,0,0,1],
+                    [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,0,2,2,0,0,0,0,0,0,2,0,0,0,1],
+                    [1,0,0,2,2,0,0,0,0,0,0,2,0,0,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,0,2,2,2,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,2,0,0,0,0,0,0,0,0,0,0,2,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                ];
+                
+                this.mapSize = 64;
+                
+                // Game objects
+                this.circles = [];
+                this.npcs = [];
+                this.maxCircles = 8;
+                this.maxNPCs = 5;
+                
+                // Timing
+                this.lastTime = 0;
+                this.spawnTimer = 0;
+                
+                this.setupControls();
+                this.setupUI();
+                
+                console.log('Canvas FPS Game initialized');
+            }
+            
+            setupCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                
+                window.addEventListener('resize', () => {
+                    this.canvas.width = window.innerWidth;
+                    this.canvas.height = window.innerHeight;
+                });
+            }
+            
+            setupControls() {
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.key.toLowerCase()] = true;
+                });
+                
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.key.toLowerCase()] = false;
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (document.pointerLockElement === document.body && this.gameState === 'playing') {
+                        this.player.angle += e.movementX * this.mouse.sensitivity;
+                        this.player.pitch -= e.movementY * this.mouse.sensitivity;
+                        
+                        // Clamp pitch to prevent over-rotation
+                        this.player.pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, this.player.pitch));
+                    }
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (this.gameState === 'playing') {
+                        if (document.pointerLockElement !== document.body) {
+                            document.body.requestPointerLock();
+                        } else {
+                            this.shoot();
+                        }
+                    }
+                });
+            }
+            
+            setupUI() {
+                this.ui = {
+                    menu: document.getElementById('menu'),
+                    endScreen: document.getElementById('endScreen'),
+                    crosshair: document.getElementById('crosshair'),
+                    score: document.getElementById('score'),
+                    timer: document.getElementById('timer'),
+                    finalScore: document.getElementById('finalScore'),
+                    debug: document.getElementById('debug')
+                };
+            }
+            
+            startGame() {
+                this.gameState = 'playing';
+                this.gameTime = 120;
+                this.score = 0;
+                this.isRunning = true;
+                this.spawnTimer = 0;
+                
+                // Reset player to dead center of map
+                this.player.x = 512; // Dead center of 16x16 map (8 * 64)
+                this.player.y = 512;
+                this.player.angle = 0;
+                this.player.pitch = 0;
+                
+                // Clear objects
+                this.circles = [];
+                this.npcs = [];
+                
+                // Spawn initial objects
+                this.spawnCircles(5);
+                this.spawnNPCs(3);
+                
+                // Update UI
+                this.showGameUI();
+                this.updateScore(this.score);
+                this.updateTimer(this.gameTime);
+                
+                // Request pointer lock
+                document.body.requestPointerLock();
+                
+                // Start game loop
+                this.gameLoop();
+                
+                console.log('Game started');
+            }
+            
+            endGame() {
+                this.gameState = 'ended';
+                this.isRunning = false;
+                
+                if (document.pointerLockElement) {
+                    document.exitPointerLock();
+                }
+                
+                this.showEndScreen(this.score);
+                console.log('Game ended, score:', this.score);
+            }
+            
+            restartGame() {
+                this.gameState = 'menu';
+                this.showMenu();
+            }
+            
+            showMenu() {
+                this.ui.menu.style.display = 'block';
+                this.ui.endScreen.style.display = 'none';
+                this.ui.crosshair.classList.add('hidden');
+                this.ui.score.classList.add('hidden');
+                this.ui.timer.classList.add('hidden');
+                document.body.classList.remove('game-playing');
+            }
+            
+            showGameUI() {
+                this.ui.menu.style.display = 'none';
+                this.ui.endScreen.style.display = 'none';
+                this.ui.crosshair.classList.add('hidden'); // Hide HTML crosshair, use canvas one
+                this.ui.score.classList.remove('hidden');
+                this.ui.timer.classList.remove('hidden');
+                document.body.classList.add('game-playing');
+            }
+            
+            showEndScreen(score) {
+                this.ui.menu.style.display = 'none';
+                this.ui.endScreen.style.display = 'block';
+                this.ui.crosshair.classList.add('hidden');
+                this.ui.score.classList.add('hidden');
+                this.ui.timer.classList.add('hidden');
+                document.body.classList.remove('game-playing');
+                
+                this.ui.finalScore.textContent = `Final Score: ${score}`;
+            }
+            
+            updateScore(score) {
+                this.ui.score.textContent = `Score: ${score}`;
+            }
+            
+            updateTimer(time) {
+                const minutes = Math.floor(time / 60);
+                const seconds = Math.floor(time % 60);
+                this.ui.timer.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            gameLoop() {
+                const currentTime = performance.now();
+                const deltaTime = (currentTime - this.lastTime) / 1000;
+                this.lastTime = currentTime;
+                
+                if (this.gameState === 'playing') {
+                    this.update(deltaTime);
+                    this.render();
+                    
+                    if (this.isRunning) {
+                        requestAnimationFrame(() => this.gameLoop());
+                    }
+                }
+            }
+            
+            update(deltaTime) {
+                // Update player movement
+                this.updatePlayer(deltaTime);
+                
+                // Update game objects
+                this.updateCircles(deltaTime);
+                this.updateNPCs(deltaTime);
+                
+                // Update spawn timer
+                this.spawnTimer += deltaTime;
+                if (this.spawnTimer >= 30) {
+                    this.spawnCircles(2);
+                    this.spawnTimer = 0;
+                }
+                
+                // Update game timer
+                this.gameTime -= deltaTime;
+                this.updateTimer(Math.max(0, this.gameTime));
+                
+                if (this.gameTime <= 0) {
+                    this.endGame();
+                }
+                
+                // Debug info
+                this.ui.debug.innerHTML = `
+                    Player: (${this.player.x.toFixed(1)}, ${this.player.y.toFixed(1)})<br>
+                    Angle: ${(this.player.angle * 180 / Math.PI).toFixed(1)}°<br>
+                    Pitch: ${(this.player.pitch * 180 / Math.PI).toFixed(1)}°<br>
+                    Circles: ${this.circles.length}<br>
+                    NPCs: ${this.npcs.length}
+                `;
+            }
+            
+            updatePlayer(deltaTime) {
+                const moveSpeed = 50 * deltaTime;
+                const newX = this.player.x;
+                const newY = this.player.y;
+                
+                // Movement
+                if (this.keys['w']) {
+                    const newPlayerX = this.player.x + Math.cos(this.player.angle) * moveSpeed;
+                    const newPlayerY = this.player.y + Math.sin(this.player.angle) * moveSpeed;
+                    if (!this.isWall(newPlayerX, this.player.y)) this.player.x = newPlayerX;
+                    if (!this.isWall(this.player.x, newPlayerY)) this.player.y = newPlayerY;
+                }
+                if (this.keys['s']) {
+                    const newPlayerX = this.player.x - Math.cos(this.player.angle) * moveSpeed;
+                    const newPlayerY = this.player.y - Math.sin(this.player.angle) * moveSpeed;
+                    if (!this.isWall(newPlayerX, this.player.y)) this.player.x = newPlayerX;
+                    if (!this.isWall(this.player.x, newPlayerY)) this.player.y = newPlayerY;
+                }
+                if (this.keys['a']) {
+                    const newPlayerX = this.player.x + Math.cos(this.player.angle - Math.PI/2) * moveSpeed;
+                    const newPlayerY = this.player.y + Math.sin(this.player.angle - Math.PI/2) * moveSpeed;
+                    if (!this.isWall(newPlayerX, this.player.y)) this.player.x = newPlayerX;
+                    if (!this.isWall(this.player.x, newPlayerY)) this.player.y = newPlayerY;
+                }
+                if (this.keys['d']) {
+                    const newPlayerX = this.player.x + Math.cos(this.player.angle + Math.PI/2) * moveSpeed;
+                    const newPlayerY = this.player.y + Math.sin(this.player.angle + Math.PI/2) * moveSpeed;
+                    if (!this.isWall(newPlayerX, this.player.y)) this.player.x = newPlayerX;
+                    if (!this.isWall(this.player.x, newPlayerY)) this.player.y = newPlayerY;
+                }
+            }
+            
+            isWall(x, y) {
+                const mapX = Math.floor(x / this.mapSize);
+                const mapY = Math.floor(y / this.mapSize);
+                
+                if (mapX < 0 || mapX >= this.map[0].length || mapY < 0 || mapY >= this.map.length) {
+                    return true;
+                }
+                
+                return this.map[mapY][mapX] !== 0;
+            }
+            
+            spawnCircles(count) {
+                for (let i = 0; i < count && this.circles.length < this.maxCircles; i++) {
+                    const circle = {
+                        x: Math.random() * 800 + 100,
+                        y: Math.random() * 800 + 100,
+                        color: this.getRandomColor(),
+                        radius: 20,
+                        floatOffset: Math.random() * Math.PI * 2,
+                        spawnTime: Date.now()
+                    };
+                    
+                    // Make sure it's not in a wall
+                    if (!this.isWall(circle.x, circle.y)) {
+                        this.circles.push(circle);
+                    }
+                }
+            }
+            
+            spawnNPCs(count) {
+                for (let i = 0; i < count && this.npcs.length < this.maxNPCs; i++) {
+                    const npc = {
+                        x: Math.random() * 800 + 100,
+                        y: Math.random() * 800 + 100,
+                        type: ['pig', 'sheep', 'cow'][Math.floor(Math.random() * 3)],
+                        color: ['#FFB6C1', '#F5F5DC', '#654321'][Math.floor(Math.random() * 3)],
+                        size: 15,
+                        moveAngle: Math.random() * Math.PI * 2,
+                        moveTimer: 0,
+                        spawnTime: Date.now()
+                    };
+                    
+                    if (!this.isWall(npc.x, npc.y)) {
+                        this.npcs.push(npc);
+                    }
+                }
+            }
+            
+            updateCircles(deltaTime) {
+                this.circles.forEach(circle => {
+                    // Floating animation
+                    const time = Date.now() * 0.001;
+                    circle.floatY = Math.sin(time + circle.floatOffset) * 5;
+                });
+                
+                // Remove old circles
+                this.circles = this.circles.filter(circle => {
+                    return Date.now() - circle.spawnTime < 60000;
+                });
+            }
+            
+            updateNPCs(deltaTime) {
+                this.npcs.forEach(npc => {
+                    npc.moveTimer += deltaTime;
+                    
+                    if (npc.moveTimer > 2) {
+                        npc.moveAngle = Math.random() * Math.PI * 2;
+                        npc.moveTimer = 0;
+                    }
+                    
+                    const moveSpeed = 20 * deltaTime;
+                    const newX = npc.x + Math.cos(npc.moveAngle) * moveSpeed;
+                    const newY = npc.y + Math.sin(npc.moveAngle) * moveSpeed;
+                    
+                    if (!this.isWall(newX, newY)) {
+                        npc.x = newX;
+                        npc.y = newY;
+                    } else {
+                        npc.moveAngle += Math.PI;
+                    }
+                });
+            }
+            
+            getRandomColor() {
+                const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FF8000', '#8000FF'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            shoot() {
+                // Cast ray in the direction player is looking
+                const rayResult = this.castRay(this.player.angle);
+                const maxRange = 300;
+                
+                // Check if we hit a wall too close
+                if (rayResult.distance < 50) {
+                    this.showMessage('Too close to wall!', '#FFFF00');
+                    return;
+                }
+                
+                // Get all objects in range and in front of player
+                const objectsInRange = [];
+                
+                // Check circles
+                this.circles.forEach((circle, index) => {
+                    const dx = circle.x - this.player.x;
+                    const dy = circle.y - this.player.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance <= maxRange) {
+                        const objAngle = Math.atan2(dy, dx);
+                        let angleDiff = objAngle - this.player.angle;
+                        
+                        // Normalize angle
+                        while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                        while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+                        
+                        // Check if in crosshair range (narrow cone)
+                        if (Math.abs(angleDiff) < 0.1) { // ~6 degree cone
+                            objectsInRange.push({
+                                type: 'circle',
+                                index: index,
+                                distance: distance,
+                                object: circle
+                            });
+                        }
+                    }
+                });
+                
+                // Check NPCs
+                this.npcs.forEach((npc, index) => {
+                    const dx = npc.x - this.player.x;
+                    const dy = npc.y - this.player.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance <= maxRange) {
+                        const objAngle = Math.atan2(dy, dx);
+                        let angleDiff = objAngle - this.player.angle;
+                        
+                        // Normalize angle
+                        while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                        while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+                        
+                        // Check if in crosshair range
+                        if (Math.abs(angleDiff) < 0.1) {
+                            objectsInRange.push({
+                                type: 'npc',
+                                index: index,
+                                distance: distance,
+                                object: npc
+                            });
+                        }
+                    }
+                });
+                
+                // Sort by distance (closest first)
+                objectsInRange.sort((a, b) => a.distance - b.distance);
+                
+                // Hit the closest object
+                if (objectsInRange.length > 0) {
+                    const hit = objectsInRange[0];
+                    
+                    if (hit.type === 'circle') {
+                        this.score += 10;
+                        this.updateScore(this.score);
+                        this.circles.splice(hit.index, 1);
+                        this.showMessage('+10 Points!', '#00FF00');
+                        console.log('Hit circle! Score:', this.score);
+                    } else if (hit.type === 'npc') {
+                        this.score -= 1;
+                        this.updateScore(this.score);
+                        this.showMessage('-1 Point', '#FF0000');
+                        console.log('Hit NPC! Score:', this.score);
+                    }
+                } else {
+                    this.showMessage('Miss!', '#888888');
+                }
+            }
+            
+            showMessage(text, color) {
+                // Create temporary message element
+                const message = document.createElement('div');
+                message.style.cssText = `
+                    position: absolute;
+                    top: 60%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: ${color};
+                    font-size: 24px;
+                    font-weight: bold;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+                    pointer-events: none;
+                    z-index: 200;
+                `;
+                message.textContent = text;
+                document.getElementById('ui').appendChild(message);
+                
+                setTimeout(() => {
+                    message.remove();
+                }, 1500);
+            }
+            
+            render() {
+                // Clear canvas
+                this.ctx.fillStyle = '#87CEEB';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Render 3D-like view using raycasting
+                this.renderRaycasting();
+                
+                // Render 2D minimap
+                this.renderMinimap();
+            }
+            
+            renderRaycasting() {
+                const rayCount = Math.floor(this.canvas.width / 1); // More rays for better quality
+                const fov = Math.PI / 3; // 60 degrees
+                const stripWidth = this.canvas.width / rayCount;
+                
+                // Calculate horizon line based on pitch
+                const horizon = this.canvas.height / 2 + (this.player.pitch / (Math.PI / 2)) * (this.canvas.height / 4);
+                
+                // Draw floor and ceiling with pitch
+                this.ctx.fillStyle = '#654321'; // Brown floor
+                this.ctx.fillRect(0, horizon, this.canvas.width, this.canvas.height - horizon);
+                
+                this.ctx.fillStyle = '#87CEEB'; // Sky ceiling
+                this.ctx.fillRect(0, 0, this.canvas.width, horizon);
+                
+                for (let i = 0; i < rayCount; i++) {
+                    const rayAngle = this.player.angle - fov/2 + (fov * i / rayCount);
+                    const rayResult = this.castRay(rayAngle);
+                    
+                    if (rayResult.distance > 0 && rayResult.distance < 1000) {
+                        // Fix fish-eye effect
+                        const correctedDistance = rayResult.distance * Math.cos(rayAngle - this.player.angle);
+                        
+                        // Calculate wall height on screen with increased scale
+                        const wallHeight = Math.min(this.canvas.height * 2, (this.canvas.height / correctedDistance) * 200);
+                        const wallTop = horizon - wallHeight / 2;
+                        
+                        // Color based on wall type and distance
+                        let wallColor;
+                        if (rayResult.wallType === 1) {
+                            // Outer walls - dark gray
+                            const brightness = Math.max(30, 120 - correctedDistance / 3);
+                            wallColor = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                        } else if (rayResult.wallType === 2) {
+                            // Buildings - brown/tan
+                            const brightness = Math.max(40, 160 - correctedDistance / 3);
+                            wallColor = `rgb(${brightness}, ${Math.floor(brightness * 0.8)}, ${Math.floor(brightness * 0.6)})`;
+                        }
+                        
+                        // Draw wall slice
+                        this.ctx.fillStyle = wallColor;
+                        this.ctx.fillRect(i * stripWidth, wallTop, stripWidth + 1, wallHeight);
+                        
+                        // Add edge highlighting for better definition
+                        if (i > 0) {
+                            const prevRayResult = this.castRay(this.player.angle - fov/2 + (fov * (i-1) / rayCount));
+                            if (Math.abs(rayResult.distance - prevRayResult.distance) > 20) {
+                                this.ctx.fillStyle = '#000';
+                                this.ctx.fillRect(i * stripWidth, wallTop, 1, wallHeight);
+                            }
+                        }
+                    }
+                }
+                
+                // Render game objects (circles and NPCs) in 3D space
+                this.renderGameObjects3D();
+                
+                // Render crosshair with dynamic color
+                this.renderCrosshair();
+            }
+            
+            castRay(angle) {
+                const rayStep = 1;
+                let rayX = this.player.x;
+                let rayY = this.player.y;
+                let steps = 0;
+                const maxSteps = 1000; // Prevent infinite loops
+                
+                while (!this.isWall(rayX, rayY) && steps < maxSteps) {
+                    rayX += Math.cos(angle) * rayStep;
+                    rayY += Math.sin(angle) * rayStep;
+                    steps++;
+                }
+                
+                const distance = Math.sqrt((rayX - this.player.x) ** 2 + (rayY - this.player.y) ** 2);
+                
+                // Get wall type
+                const mapX = Math.floor(rayX / this.mapSize);
+                const mapY = Math.floor(rayY / this.mapSize);
+                let wallType = 1;
+                
+                if (mapX >= 0 && mapX < this.map[0].length && mapY >= 0 && mapY < this.map.length) {
+                    wallType = this.map[mapY][mapX];
+                }
+                
+                return {
+                    distance: distance,
+                    wallType: wallType,
+                    hitX: rayX,
+                    hitY: rayY
+                };
+            }
+            
+            renderGameObjects3D() {
+                // Render circles and NPCs in the 3D view
+                const allObjects = [...this.circles, ...this.npcs];
+                
+                // Sort objects by distance (farthest first)
+                allObjects.sort((a, b) => {
+                    const distA = Math.sqrt((a.x - this.player.x) ** 2 + (a.y - this.player.y) ** 2);
+                    const distB = Math.sqrt((b.x - this.player.x) ** 2 + (b.y - this.player.y) ** 2);
+                    return distB - distA;
+                });
+                
+                allObjects.forEach(obj => {
+                    this.renderObject3D(obj);
+                });
+            }
+            
+            renderObject3D(obj) {
+                const dx = obj.x - this.player.x;
+                const dy = obj.y - this.player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 5) return; // Too close
+                
+                // Calculate angle relative to player
+                const objAngle = Math.atan2(dy, dx);
+                let angleDiff = objAngle - this.player.angle;
+                
+                // Normalize angle
+                while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+                
+                // Check if object is in field of view
+                const fov = Math.PI / 3;
+                if (Math.abs(angleDiff) > fov / 2) return;
+                
+                // Calculate screen position
+                const screenX = (angleDiff / (fov / 2)) * (this.canvas.width / 2) + this.canvas.width / 2;
+                
+                // Calculate object size based on distance
+                const baseSize = obj.radius || obj.size || 20;
+                const screenSize = Math.max(5, (baseSize * this.canvas.height) / (distance * 1.5));
+                
+                // Calculate horizon line based on pitch
+                const horizon = this.canvas.height / 2 + (this.player.pitch / (Math.PI / 2)) * (this.canvas.height / 4);
+                const screenY = horizon - screenSize / 2;
+                
+                // Add floating effect for circles
+                let floatOffset = 0;
+                if (obj.floatY !== undefined) {
+                    floatOffset = obj.floatY;
+                }
+                
+                // Draw object
+                this.ctx.fillStyle = obj.color;
+                
+                if (obj.radius) {
+                    // Circle with glow effect
+                    this.ctx.save();
+                    this.ctx.shadowColor = obj.color;
+                    this.ctx.shadowBlur = 15;
+                    this.ctx.beginPath();
+                    this.ctx.arc(screenX, screenY + floatOffset, screenSize / 2, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Inner bright core
+                    this.ctx.shadowBlur = 5;
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.beginPath();
+                    this.ctx.arc(screenX, screenY + floatOffset, screenSize / 4, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                } else {
+                    // NPC (square with more detail)
+                    this.ctx.fillRect(screenX - screenSize / 2, screenY, screenSize, screenSize);
+                    
+                    // Add simple face
+                    this.ctx.fillStyle = '#000';
+                    const eyeSize = Math.max(1, screenSize / 8);
+                    this.ctx.fillRect(screenX - screenSize / 4, screenY + screenSize / 4, eyeSize, eyeSize);
+                    this.ctx.fillRect(screenX + screenSize / 8, screenY + screenSize / 4, eyeSize, eyeSize);
+                    
+                    // Add mouth
+                    this.ctx.fillRect(screenX - screenSize / 6, screenY + screenSize / 2, screenSize / 3, eyeSize / 2);
+                }
+            }
+            
+            renderCrosshair() {
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const size = 20;
+                
+                // Check if aiming at target
+                let crosshairColor = '#ffffff';
+                const objectsInRange = this.getObjectsInCrosshair();
+                
+                if (objectsInRange.length > 0) {
+                    if (objectsInRange[0].type === 'circle') {
+                        crosshairColor = '#00ff00'; // Green for circles
+                    } else {
+                        crosshairColor = '#ff0000'; // Red for NPCs
+                    }
+                }
+                
+                this.ctx.strokeStyle = crosshairColor;
+                this.ctx.lineWidth = 2;
+                this.ctx.shadowColor = '#000000';
+                this.ctx.shadowBlur = 3;
+                
+                // Draw crosshair
+                this.ctx.beginPath();
+                // Horizontal line
+                this.ctx.moveTo(centerX - size, centerY);
+                this.ctx.lineTo(centerX + size, centerY);
+                // Vertical line  
+                this.ctx.moveTo(centerX, centerY - size);
+                this.ctx.lineTo(centerX, centerY + size);
+                this.ctx.stroke();
+                
+                // Draw center dot
+                this.ctx.fillStyle = crosshairColor;
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, 2, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.shadowBlur = 0;
+            }
+            
+            getObjectsInCrosshair() {
+                const objectsInRange = [];
+                const maxRange = 300;
+                
+                // Check circles
+                this.circles.forEach((circle, index) => {
+                    const dx = circle.x - this.player.x;
+                    const dy = circle.y - this.player.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance <= maxRange) {
+                        const objAngle = Math.atan2(dy, dx);
+                        let angleDiff = objAngle - this.player.angle;
+                        
+                        // Normalize angle
+                        while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                        while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+                        
+                        if (Math.abs(angleDiff) < 0.1) {
+                            objectsInRange.push({
+                                type: 'circle',
+                                index: index,
+                                distance: distance,
+                                object: circle
+                            });
+                        }
+                    }
+                });
+                
+                // Check NPCs
+                this.npcs.forEach((npc, index) => {
+                    const dx = npc.x - this.player.x;
+                    const dy = npc.y - this.player.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance <= maxRange) {
+                        const objAngle = Math.atan2(dy, dx);
+                        let angleDiff = objAngle - this.player.angle;
+                        
+                        while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                        while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+                        
+                        if (Math.abs(angleDiff) < 0.1) {
+                            objectsInRange.push({
+                                type: 'npc',
+                                index: index,
+                                distance: distance,
+                                object: npc
+                            });
+                        }
+                    }
+                });
+                
+                return objectsInRange.sort((a, b) => a.distance - b.distance);
+            }
+            
+            renderMinimap() {
+                const minimapSize = 200;
+                const minimapX = this.canvas.width - minimapSize - 10;
+                const minimapY = 10;
+                const scale = minimapSize / (this.map[0].length * this.mapSize);
+                
+                // Draw minimap background
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                this.ctx.fillRect(minimapX, minimapY, minimapSize, minimapSize);
+                
+                // Draw map
+                for (let y = 0; y < this.map.length; y++) {
+                    for (let x = 0; x < this.map[y].length; x++) {
+                        const cellX = minimapX + x * this.mapSize * scale;
+                        const cellY = minimapY + y * this.mapSize * scale;
+                        const cellSize = this.mapSize * scale;
+                        
+                        if (this.map[y][x] === 1) {
+                            this.ctx.fillStyle = '#666';
+                        } else if (this.map[y][x] === 2) {
+                            this.ctx.fillStyle = '#888';
+                        } else {
+                            this.ctx.fillStyle = '#333';
+                        }
+                        
+                        this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
+                    }
+                }
+                
+                // Draw player
+                this.ctx.fillStyle = '#00FF00';
+                this.ctx.beginPath();
+                this.ctx.arc(
+                    minimapX + this.player.x * scale,
+                    minimapY + this.player.y * scale,
+                    3, 0, Math.PI * 2
+                );
+                this.ctx.fill();
+                
+                // Draw player direction
+                this.ctx.strokeStyle = '#00FF00';
+                this.ctx.beginPath();
+                this.ctx.moveTo(
+                    minimapX + this.player.x * scale,
+                    minimapY + this.player.y * scale
+                );
+                this.ctx.lineTo(
+                    minimapX + this.player.x * scale + Math.cos(this.player.angle) * 20,
+                    minimapY + this.player.y * scale + Math.sin(this.player.angle) * 20
+                );
+                this.ctx.stroke();
+                
+                // Draw circles
+                this.circles.forEach(circle => {
+                    this.ctx.fillStyle = circle.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(
+                        minimapX + circle.x * scale,
+                        minimapY + circle.y * scale,
+                        2, 0, Math.PI * 2
+                    );
+                    this.ctx.fill();
+                });
+                
+                // Draw NPCs
+                this.npcs.forEach(npc => {
+                    this.ctx.fillStyle = npc.color;
+                    this.ctx.fillRect(
+                        minimapX + npc.x * scale - 1,
+                        minimapY + npc.y * scale - 1,
+                        2, 2
+                    );
+                });
+            }
+        }
+        
+        // Global game instance
+        let game;
+        
+        // Global functions for HTML buttons
+        function startGame() {
+            if (game) {
+                game.startGame();
+            }
+        }
+        
+        function restartGame() {
+            if (game) {
+                game.restartGame();
+            }
+        }
+        
+        // Initialize game when page loads
+        window.addEventListener('load', () => {
+            try {
+                console.log('Initializing Canvas FPS Game...');
+                game = new CanvasFPSGame();
+                console.log('Game initialized successfully!');
+            } catch (error) {
+                console.error('Failed to initialize game:', error);
+                alert('Failed to load game: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

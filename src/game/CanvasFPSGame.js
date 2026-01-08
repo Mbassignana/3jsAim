@@ -12,6 +12,12 @@
  */
 
 import { EventEmitter, GameEvents } from '../utils/EventEmitter.js';
+import {
+  TargetingSystem,
+  Canvas2DRaycastStrategy,
+  TargetType,
+  TargetCategory,
+} from './TargetingSystem.js';
 
 /**
  * @typedef {Object} PlayerState
@@ -168,6 +174,57 @@ export class CanvasFPSGame extends EventEmitter {
 
     /** @type {number} */
     this.lastTime = 0;
+
+    // Initialize targeting system
+    this._initTargetingSystem();
+  }
+
+  /**
+   * Initialize the targeting system with Canvas 2D strategy
+   * @private
+   */
+  _initTargetingSystem() {
+    const strategy = new Canvas2DRaycastStrategy({
+      maxRange: this.config.shootRange,
+      coneAngle: this.config.shootConeAngle,
+    });
+
+    /** @type {TargetingSystem} */
+    this.targetingSystem = new TargetingSystem({
+      strategy,
+      maxRange: this.config.shootRange,
+    });
+
+    // Forward targeting events
+    this.targetingSystem.on('shoot:hit', (data) => {
+      this.emit('targeting:hit', data);
+    });
+
+    this.targetingSystem.on('shoot:miss', (data) => {
+      this.emit('targeting:miss', data);
+    });
+  }
+
+  /**
+   * Sync targets with the targeting system
+   * Call this after circles or NPCs change
+   * @private
+   */
+  _syncTargets() {
+    // Add type property to circles for targeting system
+    const circleTargets = this.circles.map((circle) => ({
+      ...circle,
+      type: TargetType.CIRCLE,
+    }));
+
+    // Add type property to NPCs for targeting system
+    const npcTargets = this.npcs.map((npc) => ({
+      ...npc,
+      type: TargetType.NPC,
+    }));
+
+    this.targetingSystem.registerTargets('circles', circleTargets);
+    this.targetingSystem.registerTargets('npcs', npcTargets);
   }
 
   /**
@@ -531,30 +588,34 @@ export class CanvasFPSGame extends EventEmitter {
 
   /**
    * Get objects in the player's crosshair/line of fire
+   * Delegates to TargetingSystem for unified raycasting logic
    * @returns {Array<{type: string, index: number, distance: number, object: Circle|NPC}>}
    */
   getObjectsInCrosshair() {
-    const objectsInRange = [];
-    const maxRange = this.config.shootRange;
+    // Sync current targets with targeting system
+    this._syncTargets();
 
-    // Check circles
-    this.circles.forEach((circle, index) => {
-      const result = this._checkObjectInCrosshair(circle, index, 'circle');
-      if (result) {
-        objectsInRange.push(result);
-      }
+    // Get player origin for raycasting
+    const origin = {
+      x: this.player.x,
+      y: this.player.y,
+      angle: this.player.angle,
+    };
+
+    // Get hits from targeting system
+    const hits = this.targetingSystem.getObjectsInCrosshair(origin, {
+      targetTypes: TargetCategory.SHOOTABLE,
     });
 
-    // Check NPCs
-    this.npcs.forEach((npc, index) => {
-      const result = this._checkObjectInCrosshair(npc, index, 'npc');
-      if (result) {
-        objectsInRange.push(result);
-      }
-    });
-
-    // Sort by distance (closest first)
-    return objectsInRange.sort((a, b) => a.distance - b.distance);
+    // Convert to original format for backward compatibility
+    return hits.map((hit) => ({
+      type: hit.type,
+      index: hit.originalIndex,
+      distance: hit.distance,
+      object: hit.type === TargetType.CIRCLE
+        ? this.circles[hit.originalIndex]
+        : this.npcs[hit.originalIndex],
+    }));
   }
 
   /**
@@ -564,6 +625,7 @@ export class CanvasFPSGame extends EventEmitter {
    * @param {string} type - Object type
    * @returns {Object|null}
    * @private
+   * @deprecated Use getObjectsInCrosshair() instead - kept for backward compatibility
    */
   _checkObjectInCrosshair(obj, index, type) {
     const dx = obj.x - this.player.x;

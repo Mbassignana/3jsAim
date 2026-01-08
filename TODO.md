@@ -8,7 +8,7 @@
 - [x] 5. Create unit tests for `Player` class (movement, shooting, physics interaction)
 - [x] 6. Create unit tests for `UIManager` (state transitions, score display, timer)
 - [x] 7. Create unit tests for `PhysicsWorld` (collision detection, raycast, body management)
-- [ ] 8. Create unit tests for `SceneManager` (building generation, safe spawn positions)
+- [x] 8. Create unit tests for `SceneManager` (building generation, safe spawn positions)
 - [ ] 9. Create integration tests for game flow (menu -> play -> end -> restart)
 - [ ] 10. Create end-to-end tests using Playwright for full game simulation
 
@@ -65,7 +65,7 @@
 - [x] 50. Add pause functionality with escape key
 
 ---
-**Progress:** 31/50 completed
-**Last Updated:** 2026-01-07 21:56
-**Current Focus:** Item 8 - SceneManager unit tests
+**Progress:** 32/50 completed
+**Last Updated:** 2026-01-07 21:59
+**Current Focus:** Item 9 - Integration tests for game flow
 **Blockers:** None

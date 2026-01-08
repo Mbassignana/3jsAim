@@ -9,6 +9,7 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
       '@game': resolve(__dirname, './src/game'),
       '@physics': resolve(__dirname, './src/physics'),
+      '@scene': resolve(__dirname, './src/scene'),
       '@ui': resolve(__dirname, './src/ui'),
       '@utils': resolve(__dirname, './src/utils'),
     },

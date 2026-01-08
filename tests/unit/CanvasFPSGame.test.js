@@ -588,7 +588,11 @@ describe('CanvasFPSGame', () => {
     });
 
     it('should create NPCs with valid properties', () => {
-      game.spawnNPCs(1);
+      // Spawn multiple NPCs to ensure at least one lands in a valid position
+      // (some may be rejected if they spawn inside walls)
+      game.spawnNPCs(game.config.maxNPCs);
+      expect(game.npcs.length).toBeGreaterThan(0);
+
       const npc = game.npcs[0];
 
       expect(npc).toBeDefined();

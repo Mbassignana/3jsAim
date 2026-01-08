@@ -262,6 +262,143 @@
             font-size: 12px;
             z-index: 200;
         }
+
+        #fpsCounter {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #0f0;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            z-index: 200;
+        }
+
+        #pauseMenu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            color: #fff;
+            pointer-events: all;
+            display: none;
+            z-index: 300;
+        }
+
+        #pauseMenu h2 {
+            color: #ff6b00;
+            margin-bottom: 20px;
+        }
+
+        #pauseMenu button {
+            display: block;
+            width: 200px;
+            margin: 10px auto;
+            padding: 12px;
+            font-size: 16px;
+            background: #333;
+            color: #fff;
+            border: 2px solid #555;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+
+        #pauseMenu button:hover {
+            background: #444;
+            border-color: #ff6b00;
+        }
+
+        #powerUpDisplay {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .powerup-active {
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .powerup-timer {
+            width: 60px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .powerup-timer-fill {
+            height: 100%;
+            background: #0f0;
+            transition: width 0.1s linear;
+        }
+
+        #settingsPanel {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .setting-row label {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .setting-row input[type="range"] {
+            width: 120px;
+        }
+
+        .setting-row select {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .difficulty-btn {
+            background: #333;
+            color: #fff;
+            border: 2px solid #555;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+
+        .difficulty-btn.active {
+            background: #ff6b00;
+            border-color: #ff6b00;
+        }
+
+        .difficulty-btn:hover {
+            border-color: #ff6b00;
+        }
     </style>
 </head>
 <body>
@@ -276,6 +413,82 @@
             <div id="multiplierInfo" class="hidden">x1.0</div>
             <div id="gameMessage"></div>
             <div id="debug"></div>
+            <div id="fpsCounter" class="hidden">FPS: 60</div>
+            <div id="powerUpDisplay"></div>
+        </div>
+
+        <div id="pauseMenu">
+            <h2>PAUSED</h2>
+            <button onclick="resumeGame()">Resume</button>
+            <button onclick="toggleSettings()">Settings</button>
+            <button onclick="quitToMenu()">Quit to Menu</button>
+            <div id="pauseSettings" style="display:none; margin-top:20px; text-align:left;">
+                <div class="setting-row">
+                    <label>Mouse Sensitivity</label>
+                    <input type="range" id="sensitivitySlider" min="1" max="100" value="50" onchange="updateSensitivity(this.value)">
+                </div>
+                <div class="setting-row">
+                    <label>Sound Volume</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="80" onchange="updateVolume(this.value)">
+                </div>
+                <div class="setting-row">
+                    <label>Music Volume</label>
+                    <input type="range" id="musicVolumeSlider" min="0" max="100" value="30" onchange="updateMusicVolume(this.value)">
+                </div>
+                <div class="setting-row">
+                    <label>Music</label>
+                    <select id="musicToggle" onchange="updateMusicEnabled(this.value)">
+                        <option value="on">On</option>
+                        <option value="off">Off</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Screen Shake</label>
+                    <select id="shakeToggle" onchange="updateShake(this.value)">
+                        <option value="on">On</option>
+                        <option value="off">Off</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Colorblind Mode</label>
+                    <select id="colorblindSelect" onchange="updateColorblind(this.value)">
+                        <option value="off">Off</option>
+                        <option value="protanopia">Protanopia</option>
+                        <option value="deuteranopia">Deuteranopia</option>
+                        <option value="tritanopia">Tritanopia</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Show FPS</label>
+                    <select id="fpsToggle" onchange="updateFpsDisplay(this.value)">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Crosshair Style</label>
+                    <select id="crosshairStyleSelect" onchange="updateCrosshairStyle(this.value)">
+                        <option value="cross">Cross</option>
+                        <option value="plus">Plus</option>
+                        <option value="circle">Circle</option>
+                        <option value="dot">Dot</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Crosshair Color</label>
+                    <select id="crosshairColorSelect" onchange="updateCrosshairColor(this.value)">
+                        <option value="#ffffff">White</option>
+                        <option value="#00ffff">Cyan</option>
+                        <option value="#ff00ff">Magenta</option>
+                        <option value="#ffff00">Yellow</option>
+                        <option value="#00ff00">Green</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Crosshair Size</label>
+                    <input type="range" id="crosshairSizeSlider" min="10" max="40" value="20" onchange="updateCrosshairSize(this.value)">
+                </div>
+            </div>
         </div>
         
         <div id="menu">
@@ -310,12 +523,59 @@
                 </p>
             </div>
 
+            <div id="difficultySelect" style="margin: 20px 0;">
+                <p style="color: #2ecc71; margin-bottom: 10px;">Select Difficulty:</p>
+                <button onclick="selectDifficulty('easy')" class="difficulty-btn" id="diff-easy">Easy</button>
+                <button onclick="selectDifficulty('medium')" class="difficulty-btn active" id="diff-medium">Medium</button>
+                <button onclick="selectDifficulty('hard')" class="difficulty-btn" id="diff-hard">Hard</button>
+            </div>
+
             <button onclick="startGame()" style="font-size: 24px; padding: 20px 50px;">Start Game</button>
+            <div style="margin-top: 10px;">
+                <button onclick="toggleMenuSettings()" style="font-size: 16px; padding: 10px 20px; background: #333;">Settings</button>
+                <button onclick="showLeaderboard()" style="font-size: 16px; padding: 10px 20px; background: #333;">Leaderboard</button>
+                <button onclick="showStats()" style="font-size: 16px; padding: 10px 20px; background: #333;">Stats</button>
+                <button onclick="showAchievements()" style="font-size: 16px; padding: 10px 20px; background: #333;">Achievements</button>
+            </div>
+
+            <div id="settingsPanel">
+                <div class="setting-row">
+                    <label>Mouse Sensitivity</label>
+                    <input type="range" id="menuSensitivitySlider" min="1" max="100" value="50" onchange="updateSensitivity(this.value)">
+                </div>
+                <div class="setting-row">
+                    <label>Sound Volume</label>
+                    <input type="range" id="menuVolumeSlider" min="0" max="100" value="80" onchange="updateVolume(this.value)">
+                </div>
+                <div class="setting-row">
+                    <label>Screen Shake</label>
+                    <select id="menuShakeToggle" onchange="updateShake(this.value)">
+                        <option value="on">On</option>
+                        <option value="off">Off</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Colorblind Mode</label>
+                    <select id="menuColorblindSelect" onchange="updateColorblind(this.value)">
+                        <option value="off">Off</option>
+                        <option value="protanopia">Protanopia</option>
+                        <option value="deuteranopia">Deuteranopia</option>
+                        <option value="tritanopia">Tritanopia</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Show FPS</label>
+                    <select id="menuFpsToggle" onchange="updateFpsDisplay(this.value)">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>
+            </div>
 
             <div style="margin-top: 20px; font-size: 14px; color: #ccc;">
-                <p>Controls: WASD to move, Mouse to look around, Click to shoot</p>
+                <p>Controls: WASD to move, Mouse to look, Click to shoot, ESC to pause</p>
                 <p>Shoot circles (+10 points), Avoid shooting animals (-1 point)</p>
-                <p>Build streaks for score multipliers!</p>
+                <p>Build streaks for score multipliers! Collect power-ups!</p>
             </div>
         </div>
         
@@ -398,11 +658,95 @@
                 // Timing
                 this.lastTime = 0;
                 this.spawnTimer = 0;
-                
+
+                // Settings
+                this.settings = {
+                    sensitivity: 0.002,
+                    volume: 0.8,
+                    musicVolume: 0.3,
+                    musicEnabled: true,
+                    screenShake: true,
+                    colorblindMode: 'off',
+                    showFps: false,
+                    difficulty: 'medium',
+                    crosshairColor: '#ffffff',
+                    crosshairSize: 20,
+                    crosshairStyle: 'cross' // cross, dot, circle, plus
+                };
+                this.loadSettings();
+
+                // Difficulty modifiers
+                this.difficultyModifiers = {
+                    easy: { targetSize: 1.3, targetSpeed: 0.7, spawnRate: 0.8 },
+                    medium: { targetSize: 1.0, targetSpeed: 1.0, spawnRate: 1.0 },
+                    hard: { targetSize: 0.7, targetSpeed: 1.5, spawnRate: 1.3 }
+                };
+
+                // Audio system
+                this.audioContext = null;
+                this.audioInitialized = false;
+                this.sounds = {};
+
+                // Background music
+                this.musicNodes = null;
+                this.isMusicPlaying = false;
+
+                // Screen shake
+                this.shakeOffset = { x: 0, y: 0 };
+                this.activeShakes = [];
+
+                // Hit markers
+                this.hitMarkers = [];
+
+                // Floating damage numbers
+                this.floatingNumbers = [];
+
+                // Particle system
+                this.particles = [];
+
+                // Power-ups
+                this.powerUps = [];
+                this.activePowerUps = {};
+                this.powerUpSpawnTimer = 0;
+                this.powerUpSpawnInterval = 15000;
+
+                // Colorblind palettes
+                this.colorPalettes = {
+                    off: { target: '#ff4444', bonus: '#ffff44', hit: '#00ff00', miss: '#ff0000' },
+                    protanopia: { target: '#0066ff', bonus: '#ff66ff', hit: '#00ccff', miss: '#ff9900' },
+                    deuteranopia: { target: '#0066ff', bonus: '#ff66ff', hit: '#00ccff', miss: '#ff9900' },
+                    tritanopia: { target: '#ff4444', bonus: '#ffff00', hit: '#00ff88', miss: '#ff4444' }
+                };
+
+                // FPS counter
+                this.fpsHistory = [];
+                this.lastFpsUpdate = 0;
+
+                // Leaderboard
+                this.leaderboard = this.loadLeaderboard();
+
+                // Session stats (reset each session)
+                this.sessionStats = {
+                    gamesPlayed: 0,
+                    totalScore: 0,
+                    targetsHit: 0,
+                    targetsMissed: 0,
+                    bestStreak: 0,
+                    totalPlayTime: 0
+                };
+
+                // Lifetime stats (persisted)
+                this.lifetimeStats = this.loadLifetimeStats();
+
+                // Achievement system
+                this.achievements = this.defineAchievements();
+                this.unlockedAchievements = this.loadAchievements();
+
                 this.setupControls();
                 this.setupUI();
-                
-                console.log('Canvas FPS Game initialized');
+                this.initAudio();
+
+                console.log('Canvas FPS Game initialized with integrated features');
             }
             
             setupCanvas() {
@@ -418,23 +762,37 @@
             setupControls() {
                 document.addEventListener('keydown', (e) => {
                     this.keys[e.key.toLowerCase()] = true;
+
+                    // Handle pause with Escape
+                    if (e.key === 'Escape') {
+                        if (this.gameState === 'playing') {
+                            this.pauseGame();
+                        } else if (this.gameState === 'paused') {
+                            this.resumeGame();
+                        }
+                    }
                 });
-                
+
                 document.addEventListener('keyup', (e) => {
                     this.keys[e.key.toLowerCase()] = false;
                 });
-                
+
                 document.addEventListener('mousemove', (e) => {
                     if (document.pointerLockElement === document.body && this.gameState === 'playing') {
-                        this.player.angle += e.movementX * this.mouse.sensitivity;
-                        this.player.pitch -= e.movementY * this.mouse.sensitivity;
-                        
+                        this.player.angle += e.movementX * this.settings.sensitivity;
+                        this.player.pitch -= e.movementY * this.settings.sensitivity;
+
                         // Clamp pitch to prevent over-rotation
                         this.player.pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, this.player.pitch));
                     }
                 });
-                
+
                 document.addEventListener('click', (e) => {
+                    // Initialize audio on first click (required by browsers)
+                    if (!this.audioInitialized) {
+                        this.initAudio();
+                    }
+
                     if (this.gameState === 'playing') {
                         if (document.pointerLockElement !== document.body) {
                             document.body.requestPointerLock();
@@ -458,7 +816,10 @@
                     streakInfo: document.getElementById('streakInfo'),
                     multiplierInfo: document.getElementById('multiplierInfo'),
                     gameMessage: document.getElementById('gameMessage'),
-                    modeDescription: document.getElementById('modeDescription')
+                    modeDescription: document.getElementById('modeDescription'),
+                    pauseMenu: document.getElementById('pauseMenu'),
+                    fpsCounter: document.getElementById('fpsCounter'),
+                    powerUpDisplay: document.getElementById('powerUpDisplay')
                 };
             }
 
@@ -664,8 +1025,1137 @@
                 const waveIndex = Math.min(this.currentWave - 1, modeWaves.length - 1);
                 return modeWaves[waveIndex];
             }
-            
+
+            // ==================== AUDIO SYSTEM ====================
+            initAudio() {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) {
+                        this.audioContext = new AudioContext();
+                        this.audioInitialized = true;
+                        console.log('Audio system initialized');
+                    }
+                } catch (e) {
+                    console.warn('Audio not available:', e);
+                }
+            }
+
+            startMusic() {
+                if (!this.audioContext || !this.audioInitialized || !this.settings.musicEnabled) return;
+                if (this.isMusicPlaying) return;
+
+                try {
+                    const ctx = this.audioContext;
+                    const masterGain = ctx.createGain();
+                    masterGain.gain.setValueAtTime(this.settings.musicVolume * 0.15, ctx.currentTime);
+                    masterGain.connect(ctx.destination);
+
+                    // Create ambient drone music with multiple oscillators
+                    const oscillators = [];
+                    const gains = [];
+
+                    // Base frequencies for an ambient chord (Cmaj7-ish)
+                    const baseFreqs = [65.41, 82.41, 98.00, 123.47]; // C2, E2, G2, B2
+
+                    baseFreqs.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+                        // Add slight detuning for richness
+                        osc.detune.setValueAtTime((Math.random() - 0.5) * 10, ctx.currentTime);
+
+                        // Varying volumes
+                        const baseVol = 0.3 - (i * 0.05);
+                        gain.gain.setValueAtTime(baseVol, ctx.currentTime);
+
+                        osc.connect(gain);
+                        gain.connect(masterGain);
+                        osc.start(ctx.currentTime);
+
+                        oscillators.push(osc);
+                        gains.push(gain);
+
+                        // Slow volume modulation for movement
+                        const lfo = ctx.createOscillator();
+                        const lfoGain = ctx.createGain();
+                        lfo.type = 'sine';
+                        lfo.frequency.setValueAtTime(0.1 + (i * 0.05), ctx.currentTime);
+                        lfoGain.gain.setValueAtTime(baseVol * 0.3, ctx.currentTime);
+                        lfo.connect(lfoGain);
+                        lfoGain.connect(gain.gain);
+                        lfo.start(ctx.currentTime);
+                        oscillators.push(lfo);
+                    });
+
+                    this.musicNodes = { oscillators, gains, masterGain };
+                    this.isMusicPlaying = true;
+                    console.log('Background music started');
+                } catch (e) {
+                    console.warn('Could not start music:', e);
+                }
+            }
+
+            stopMusic() {
+                if (!this.musicNodes || !this.isMusicPlaying) return;
+
+                try {
+                    const ctx = this.audioContext;
+                    const fadeTime = 0.5;
+
+                    // Fade out master gain
+                    this.musicNodes.masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + fadeTime);
+
+                    // Stop all oscillators after fade
+                    setTimeout(() => {
+                        if (this.musicNodes) {
+                            this.musicNodes.oscillators.forEach(osc => {
+                                try { osc.stop(); } catch (e) {}
+                            });
+                            this.musicNodes = null;
+                        }
+                    }, fadeTime * 1000);
+
+                    this.isMusicPlaying = false;
+                    console.log('Background music stopped');
+                } catch (e) {
+                    console.warn('Could not stop music:', e);
+                }
+            }
+
+            updateMusicVolume() {
+                if (!this.musicNodes || !this.isMusicPlaying) return;
+                const targetVol = this.settings.musicEnabled ? this.settings.musicVolume * 0.15 : 0;
+                this.musicNodes.masterGain.gain.linearRampToValueAtTime(targetVol, this.audioContext.currentTime + 0.1);
+            }
+
+            playSound(type, options = {}) {
+                if (!this.audioContext || !this.audioInitialized || this.settings.volume === 0) return;
+
+                try {
+                    const ctx = this.audioContext;
+                    const oscillator = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+                    const volume = (options.volume || 1) * this.settings.volume;
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+
+                    switch (type) {
+                        case 'shoot':
+                            oscillator.frequency.setValueAtTime(150, ctx.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.1);
+                            gainNode.gain.setValueAtTime(volume * 0.3, ctx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                            oscillator.type = 'square';
+                            oscillator.start(ctx.currentTime);
+                            oscillator.stop(ctx.currentTime + 0.1);
+                            break;
+                        case 'hit':
+                            oscillator.frequency.setValueAtTime(800, ctx.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05);
+                            gainNode.gain.setValueAtTime(volume * 0.2, ctx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                            oscillator.type = 'sine';
+                            oscillator.start(ctx.currentTime);
+                            oscillator.stop(ctx.currentTime + 0.1);
+                            break;
+                        case 'miss':
+                            oscillator.frequency.setValueAtTime(200, ctx.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
+                            gainNode.gain.setValueAtTime(volume * 0.1, ctx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                            oscillator.type = 'triangle';
+                            oscillator.start(ctx.currentTime);
+                            oscillator.stop(ctx.currentTime + 0.1);
+                            break;
+                        case 'combo':
+                            const comboLevel = options.streak || 3;
+                            const freq = 400 + (comboLevel * 100);
+                            oscillator.frequency.setValueAtTime(freq, ctx.currentTime);
+                            gainNode.gain.setValueAtTime(volume * 0.15, ctx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                            oscillator.type = 'sine';
+                            oscillator.start(ctx.currentTime);
+                            oscillator.stop(ctx.currentTime + 0.15);
+                            break;
+                        case 'powerup':
+                            oscillator.frequency.setValueAtTime(400, ctx.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.2);
+                            gainNode.gain.setValueAtTime(volume * 0.2, ctx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                            oscillator.type = 'sine';
+                            oscillator.start(ctx.currentTime);
+                            oscillator.stop(ctx.currentTime + 0.3);
+                            break;
+                        case 'gameStart':
+                            // Rising arpeggio for game start
+                            oscillator.frequency.setValueAtTime(262, ctx.currentTime);
+                            oscillator.frequency.setValueAtTime(330, ctx.currentTime + 0.1);
+                            oscillator.frequency.setValueAtTime(392, ctx.currentTime + 0.2);
+                            oscillator.frequency.setValueAtTime(523, ctx.currentTime + 0.3);
+                            gainNode.gain.setValueAtTime(volume * 0.25, ctx.currentTime);
+                            gainNode.gain.setValueAtTime(volume * 0.25, ctx.currentTime + 0.3);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                            oscillator.type = 'sine';
+                            oscillator.start(ctx.currentTime);
+                            oscillator.stop(ctx.currentTime + 0.5);
+                            break;
+                        case 'gameEnd':
+                            // Descending tone for game end
+                            oscillator.frequency.setValueAtTime(523, ctx.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(262, ctx.currentTime + 0.4);
+                            gainNode.gain.setValueAtTime(volume * 0.25, ctx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                            oscillator.type = 'sine';
+                            oscillator.start(ctx.currentTime);
+                            oscillator.stop(ctx.currentTime + 0.5);
+                            break;
+                    }
+                } catch (e) {
+                    // Silently fail if audio has issues
+                }
+            }
+
+            // ==================== SETTINGS ====================
+            loadSettings() {
+                try {
+                    const saved = localStorage.getItem('3jsAim_settings');
+                    if (saved) {
+                        Object.assign(this.settings, JSON.parse(saved));
+                    }
+                } catch (e) {
+                    console.warn('Could not load settings');
+                }
+            }
+
+            saveSettings() {
+                try {
+                    localStorage.setItem('3jsAim_settings', JSON.stringify(this.settings));
+                } catch (e) {
+                    console.warn('Could not save settings');
+                }
+            }
+
+            applySettings() {
+                this.mouse.sensitivity = this.settings.sensitivity;
+                const sensSlider = document.getElementById('sensitivitySlider') || document.getElementById('menuSensitivitySlider');
+                const volSlider = document.getElementById('volumeSlider') || document.getElementById('menuVolumeSlider');
+                const musicVolSlider = document.getElementById('musicVolumeSlider');
+                const musicToggle = document.getElementById('musicToggle');
+                const crosshairStyleSelect = document.getElementById('crosshairStyleSelect');
+                const crosshairColorSelect = document.getElementById('crosshairColorSelect');
+                const crosshairSizeSlider = document.getElementById('crosshairSizeSlider');
+                if (sensSlider) sensSlider.value = this.settings.sensitivity * 25000;
+                if (volSlider) volSlider.value = this.settings.volume * 100;
+                if (musicVolSlider) musicVolSlider.value = this.settings.musicVolume * 100;
+                if (musicToggle) musicToggle.value = this.settings.musicEnabled ? 'on' : 'off';
+                if (crosshairStyleSelect) crosshairStyleSelect.value = this.settings.crosshairStyle;
+                if (crosshairColorSelect) crosshairColorSelect.value = this.settings.crosshairColor;
+                if (crosshairSizeSlider) crosshairSizeSlider.value = this.settings.crosshairSize;
+            }
+
+            // ==================== SCREEN SHAKE ====================
+            addScreenShake(intensity = 0.05, duration = 100) {
+                if (!this.settings.screenShake) return;
+                this.activeShakes.push({
+                    intensity,
+                    duration,
+                    elapsed: 0,
+                    startTime: performance.now()
+                });
+            }
+
+            updateScreenShake(deltaTime) {
+                this.shakeOffset = { x: 0, y: 0 };
+                if (!this.settings.screenShake || this.activeShakes.length === 0) return;
+
+                const now = performance.now();
+                this.activeShakes = this.activeShakes.filter(shake => {
+                    shake.elapsed = now - shake.startTime;
+                    if (shake.elapsed >= shake.duration) return false;
+
+                    const progress = shake.elapsed / shake.duration;
+                    const decay = 1 - progress;
+                    const intensity = shake.intensity * decay;
+
+                    this.shakeOffset.x += (Math.random() - 0.5) * intensity * this.canvas.width;
+                    this.shakeOffset.y += (Math.random() - 0.5) * intensity * this.canvas.height;
+                    return true;
+                });
+            }
+
+            // ==================== HIT MARKERS ====================
+            addHitMarker(type = 'hit') {
+                const palette = this.colorPalettes[this.settings.colorblindMode] || this.colorPalettes.off;
+                let color, size, duration;
+
+                switch (type) {
+                    case 'kill':
+                        color = '#ffffff'; // White for kills
+                        size = 25;
+                        duration = 350;
+                        break;
+                    case 'hit':
+                        color = palette.hit;
+                        size = 20;
+                        duration = 200;
+                        break;
+                    default: // miss
+                        color = palette.miss;
+                        size = 12;
+                        duration = 100;
+                }
+
+                this.hitMarkers.push({
+                    type,
+                    color,
+                    x: this.canvas.width / 2,
+                    y: this.canvas.height / 2,
+                    size,
+                    ringSize: type === 'kill' ? 35 : 0,
+                    opacity: 1,
+                    duration,
+                    elapsed: 0,
+                    startTime: performance.now()
+                });
+            }
+
+            updateHitMarkers() {
+                const now = performance.now();
+                this.hitMarkers = this.hitMarkers.filter(marker => {
+                    marker.elapsed = now - marker.startTime;
+                    if (marker.elapsed >= marker.duration) return false;
+                    marker.opacity = 1 - (marker.elapsed / marker.duration);
+                    return true;
+                });
+            }
+
+            renderHitMarkers() {
+                const ctx = this.ctx;
+                for (const marker of this.hitMarkers) {
+                    const centerX = this.canvas.width / 2 + this.shakeOffset.x;
+                    const centerY = this.canvas.height / 2 + this.shakeOffset.y;
+                    const size = marker.size;
+                    const gap = size * 0.3;
+
+                    ctx.save();
+                    ctx.globalAlpha = marker.opacity;
+                    ctx.strokeStyle = marker.color;
+                    ctx.lineWidth = marker.type === 'kill' ? 4 : (marker.type === 'hit' ? 3 : 1);
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+
+                    // X pattern
+                    ctx.moveTo(centerX - size, centerY - size);
+                    ctx.lineTo(centerX - gap, centerY - gap);
+                    ctx.moveTo(centerX + size, centerY - size);
+                    ctx.lineTo(centerX + gap, centerY - gap);
+                    ctx.moveTo(centerX - size, centerY + size);
+                    ctx.lineTo(centerX - gap, centerY + gap);
+                    ctx.moveTo(centerX + size, centerY + size);
+                    ctx.lineTo(centerX + gap, centerY + gap);
+
+                    ctx.stroke();
+
+                    // Draw expanding ring for kill markers
+                    if (marker.type === 'kill' && marker.ringSize > 0) {
+                        const progress = marker.elapsed / marker.duration;
+                        const ringRadius = marker.ringSize + (progress * 20); // Expanding ring
+                        const ringOpacity = marker.opacity * (1 - progress * 0.5);
+
+                        ctx.globalAlpha = ringOpacity;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+
+                    ctx.restore();
+                }
+            }
+
+            // ==================== FLOATING DAMAGE NUMBERS ====================
+            addFloatingNumber(value, isPositive = true, x = null, y = null) {
+                const color = isPositive ? '#00ff00' : '#ff4444';
+                const prefix = isPositive ? '+' : '';
+
+                // Default to center of screen if no position given
+                const startX = x !== null ? x : this.canvas.width / 2 + (Math.random() - 0.5) * 30;
+                const startY = y !== null ? y : this.canvas.height / 2 - 30;
+
+                this.floatingNumbers.push({
+                    text: prefix + value,
+                    color,
+                    x: startX,
+                    y: startY,
+                    velocityY: -60, // Float upward
+                    velocityX: (Math.random() - 0.5) * 20,
+                    opacity: 1,
+                    scale: isPositive && value >= 20 ? 1.5 : 1.0, // Larger for big scores
+                    duration: 1000,
+                    elapsed: 0,
+                    startTime: performance.now()
+                });
+            }
+
+            updateFloatingNumbers() {
+                const now = performance.now();
+                this.floatingNumbers = this.floatingNumbers.filter(num => {
+                    const deltaTime = (now - num.startTime - num.elapsed) / 1000;
+                    num.elapsed = now - num.startTime;
+
+                    if (num.elapsed >= num.duration) return false;
+
+                    // Update position
+                    num.y += num.velocityY * deltaTime;
+                    num.x += num.velocityX * deltaTime;
+
+                    // Slow down velocity
+                    num.velocityY *= 0.98;
+                    num.velocityX *= 0.95;
+
+                    // Fade out in the last 30%
+                    const progress = num.elapsed / num.duration;
+                    if (progress > 0.7) {
+                        num.opacity = 1 - ((progress - 0.7) / 0.3);
+                    }
+
+                    return true;
+                });
+            }
+
+            renderFloatingNumbers() {
+                const ctx = this.ctx;
+                for (const num of this.floatingNumbers) {
+                    ctx.save();
+                    ctx.globalAlpha = num.opacity;
+                    ctx.font = `bold ${Math.round(20 * num.scale)}px 'Courier New', monospace`;
+                    ctx.fillStyle = num.color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    // Add shadow for visibility
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                    ctx.shadowBlur = 4;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+
+                    ctx.fillText(num.text, num.x + this.shakeOffset.x, num.y + this.shakeOffset.y);
+                    ctx.restore();
+                }
+            }
+
+            // ==================== PARTICLE SYSTEM ====================
+            spawnParticles(type, x, y, color = '#ffffff', count = 8) {
+                // Convert world position to screen position (simplified - center of screen for most effects)
+                const screenX = x !== null ? x : this.canvas.width / 2;
+                const screenY = y !== null ? y : this.canvas.height / 2;
+
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+                    const speed = 50 + Math.random() * 100;
+                    const size = type === 'powerup' ? 6 + Math.random() * 4 : 3 + Math.random() * 4;
+
+                    this.particles.push({
+                        type,
+                        x: screenX,
+                        y: screenY,
+                        velocityX: Math.cos(angle) * speed,
+                        velocityY: Math.sin(angle) * speed,
+                        size,
+                        color: type === 'powerup' ? color : this.getParticleColor(type),
+                        opacity: 1,
+                        gravity: type === 'spark' ? 200 : 100,
+                        friction: 0.95,
+                        duration: type === 'powerup' ? 800 : 500,
+                        elapsed: 0,
+                        startTime: performance.now()
+                    });
+                }
+            }
+
+            getParticleColor(type) {
+                switch (type) {
+                    case 'destroy': return ['#ff4444', '#ff8844', '#ffaa44', '#ffff44'][Math.floor(Math.random() * 4)];
+                    case 'spark': return ['#ffff88', '#ffffff', '#ffcc44'][Math.floor(Math.random() * 3)];
+                    case 'powerup': return '#00ffff';
+                    default: return '#ffffff';
+                }
+            }
+
+            updateParticles(deltaTime) {
+                const now = performance.now();
+                this.particles = this.particles.filter(p => {
+                    p.elapsed = now - p.startTime;
+                    if (p.elapsed >= p.duration) return false;
+
+                    // Update position
+                    p.x += p.velocityX * deltaTime;
+                    p.y += p.velocityY * deltaTime;
+
+                    // Apply gravity and friction
+                    p.velocityY += p.gravity * deltaTime;
+                    p.velocityX *= p.friction;
+                    p.velocityY *= p.friction;
+
+                    // Fade out
+                    const progress = p.elapsed / p.duration;
+                    p.opacity = 1 - progress;
+                    p.size *= 0.995; // Shrink over time
+
+                    return true;
+                });
+            }
+
+            renderParticles() {
+                const ctx = this.ctx;
+                for (const p of this.particles) {
+                    ctx.save();
+                    ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x + this.shakeOffset.x, p.y + this.shakeOffset.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            // ==================== POWER-UPS ====================
+            spawnPowerUp() {
+                if (this.powerUps.length >= 3) return;
+
+                const types = [
+                    { id: 'slow_motion', name: 'Slow Mo', color: '#3498db', duration: 5000, icon: 'S' },
+                    { id: 'double_points', name: '2x Points', color: '#f1c40f', duration: 8000, icon: '2' },
+                    { id: 'rapid_fire', name: 'Rapid', color: '#9b59b6', duration: 4000, icon: 'R' },
+                    { id: 'auto_aim', name: 'Auto Aim', color: '#e74c3c', duration: 6000, icon: 'A' },
+                    { id: 'shield', name: 'Shield', color: '#2ecc71', duration: 10000, icon: '!' }
+                ];
+
+                const type = types[Math.floor(Math.random() * types.length)];
+
+                let x, y, attempts = 0;
+                do {
+                    x = 100 + Math.random() * (this.canvas.width - 200);
+                    y = 100 + Math.random() * (this.canvas.height - 200);
+                    attempts++;
+                } while (attempts < 10);
+
+                this.powerUps.push({
+                    ...type,
+                    x, y,
+                    radius: 20,
+                    spawnTime: performance.now(),
+                    lifetime: 15000
+                });
+            }
+
+            collectPowerUp(index) {
+                const powerUp = this.powerUps[index];
+                if (!powerUp) return;
+
+                this.activePowerUps[powerUp.id] = {
+                    ...powerUp,
+                    endTime: performance.now() + powerUp.duration
+                };
+
+                // Spawn particles at power-up location
+                this.spawnParticles('powerup', powerUp.x, powerUp.y, powerUp.color, 10);
+
+                this.powerUps.splice(index, 1);
+                this.playSound('powerup');
+                this.updatePowerUpDisplay();
+            }
+
+            updatePowerUps(deltaTime) {
+                const now = performance.now();
+
+                this.powerUpSpawnTimer += deltaTime;
+                if (this.powerUpSpawnTimer >= this.powerUpSpawnInterval) {
+                    this.powerUpSpawnTimer = 0;
+                    this.spawnPowerUp();
+                }
+
+                this.powerUps = this.powerUps.filter(p => now - p.spawnTime < p.lifetime);
+
+                for (const [id, effect] of Object.entries(this.activePowerUps)) {
+                    if (now >= effect.endTime) {
+                        delete this.activePowerUps[id];
+                        this.updatePowerUpDisplay();
+                    }
+                }
+            }
+
+            updatePowerUpDisplay() {
+                if (!this.ui.powerUpDisplay) return;
+                const now = performance.now();
+
+                // Clear existing children safely
+                while (this.ui.powerUpDisplay.firstChild) {
+                    this.ui.powerUpDisplay.removeChild(this.ui.powerUpDisplay.firstChild);
+                }
+
+                for (const [id, effect] of Object.entries(this.activePowerUps)) {
+                    const remaining = Math.max(0, effect.endTime - now);
+                    const percent = (remaining / effect.duration) * 100;
+
+                    const container = document.createElement('div');
+                    container.className = 'powerup-active';
+                    container.style.color = effect.color;
+
+                    const iconSpan = document.createElement('span');
+                    iconSpan.textContent = effect.icon;
+                    container.appendChild(iconSpan);
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = effect.name;
+                    container.appendChild(nameSpan);
+
+                    const timerDiv = document.createElement('div');
+                    timerDiv.className = 'powerup-timer';
+                    const fillDiv = document.createElement('div');
+                    fillDiv.className = 'powerup-timer-fill';
+                    fillDiv.style.width = percent + '%';
+                    fillDiv.style.background = effect.color;
+                    timerDiv.appendChild(fillDiv);
+                    container.appendChild(timerDiv);
+
+                    this.ui.powerUpDisplay.appendChild(container);
+                }
+            }
+
+            getPowerUpModifier(type) {
+                const effect = this.activePowerUps[type];
+                if (!effect || performance.now() >= effect.endTime) return null;
+                return effect;
+            }
+
+            // ==================== PAUSE ====================
+            pauseGame() {
+                if (this.gameState !== 'playing') return;
+                this.gameState = 'paused';
+                this.isRunning = false;
+                document.exitPointerLock();
+                if (this.ui.pauseMenu) this.ui.pauseMenu.style.display = 'block';
+            }
+
+            resumeGame() {
+                if (this.gameState !== 'paused') return;
+                this.gameState = 'playing';
+                this.isRunning = true;
+                if (this.ui.pauseMenu) this.ui.pauseMenu.style.display = 'none';
+                document.body.requestPointerLock();
+                this.lastTime = performance.now();
+                this.gameLoop();
+            }
+
+            // ==================== FPS COUNTER ====================
+            updateFps(deltaTime) {
+                if (!this.settings.showFps) return;
+
+                this.fpsHistory.push(1000 / deltaTime);
+                if (this.fpsHistory.length > 60) this.fpsHistory.shift();
+
+                const now = performance.now();
+                if (now - this.lastFpsUpdate > 500) {
+                    this.lastFpsUpdate = now;
+                    const avgFps = Math.round(this.fpsHistory.reduce((a, b) => a + b, 0) / this.fpsHistory.length);
+                    if (this.ui.fpsCounter) {
+                        this.ui.fpsCounter.textContent = 'FPS: ' + avgFps;
+                        this.ui.fpsCounter.style.color = avgFps >= 50 ? '#0f0' : avgFps >= 30 ? '#ff0' : '#f00';
+                    }
+                }
+            }
+
+            // ==================== LEADERBOARD ====================
+            loadLeaderboard() {
+                try {
+                    const saved = localStorage.getItem('3jsAim_leaderboard');
+                    return saved ? JSON.parse(saved) : {};
+                } catch (e) {
+                    return {};
+                }
+            }
+
+            showLeaderboard() {
+                let modal = document.getElementById('leaderboardModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'leaderboardModal';
+                    modal.style.cssText = `
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0,0,0,0.95);
+                        padding: 30px;
+                        border-radius: 10px;
+                        color: #fff;
+                        min-width: 400px;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                        z-index: 500;
+                        font-family: 'Courier New', monospace;
+                    `;
+                    document.getElementById('ui').appendChild(modal);
+                }
+
+                // Clear modal content
+                modal.textContent = '';
+
+                // Create header
+                const header = document.createElement('h2');
+                header.textContent = 'LEADERBOARD';
+                header.style.cssText = 'color: #ff6b00; margin-bottom: 20px; text-align: center;';
+                modal.appendChild(header);
+
+                const modes = ['classic', 'flickShot', 'tracking', 'reaction', 'precision', 'elimination'];
+                const modeNames = { classic: 'Classic', flickShot: 'Flick Shot', tracking: 'Tracking', reaction: 'Reaction', precision: 'Precision', elimination: 'Elimination' };
+
+                let hasScores = false;
+                for (const mode of modes) {
+                    const scores = this.leaderboard[mode] || [];
+                    if (scores.length > 0) {
+                        hasScores = true;
+                        const section = document.createElement('div');
+                        section.style.marginBottom = '20px';
+
+                        const modeHeader = document.createElement('h3');
+                        modeHeader.textContent = modeNames[mode];
+                        modeHeader.style.cssText = 'color: #00ffff; margin-bottom: 10px;';
+                        section.appendChild(modeHeader);
+
+                        const table = document.createElement('table');
+                        table.style.cssText = 'width: 100%; border-collapse: collapse;';
+
+                        const headerRow = document.createElement('tr');
+                        headerRow.style.color = '#888';
+                        ['Rank', 'Name', 'Score', 'Diff', 'Date'].forEach(text => {
+                            const th = document.createElement('th');
+                            th.textContent = text;
+                            th.style.cssText = 'text-align: left; padding: 5px;';
+                            headerRow.appendChild(th);
+                        });
+                        table.appendChild(headerRow);
+
+                        const topScores = scores.slice(0, 5);
+                        topScores.forEach((entry, i) => {
+                            const row = document.createElement('tr');
+                            const rankColor = i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : '#fff';
+                            row.style.color = rankColor;
+
+                            const rankCell = document.createElement('td');
+                            rankCell.textContent = '#' + (i + 1);
+                            rankCell.style.padding = '5px';
+                            row.appendChild(rankCell);
+
+                            const nameCell = document.createElement('td');
+                            nameCell.textContent = entry.name || 'Player';
+                            nameCell.style.padding = '5px';
+                            row.appendChild(nameCell);
+
+                            const scoreCell = document.createElement('td');
+                            scoreCell.textContent = entry.score;
+                            scoreCell.style.padding = '5px';
+                            row.appendChild(scoreCell);
+
+                            const diffCell = document.createElement('td');
+                            diffCell.textContent = entry.difficulty;
+                            diffCell.style.padding = '5px';
+                            row.appendChild(diffCell);
+
+                            const dateCell = document.createElement('td');
+                            dateCell.textContent = new Date(entry.date).toLocaleDateString();
+                            dateCell.style.padding = '5px';
+                            row.appendChild(dateCell);
+
+                            table.appendChild(row);
+                        });
+
+                        section.appendChild(table);
+                        modal.appendChild(section);
+                    }
+                }
+
+                if (!hasScores) {
+                    const noScores = document.createElement('p');
+                    noScores.textContent = 'No scores yet. Play some games!';
+                    noScores.style.cssText = 'color: #888; text-align: center;';
+                    modal.appendChild(noScores);
+                }
+
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = 'Close';
+                closeBtn.style.cssText = 'display: block; margin: 20px auto 0; padding: 10px 30px; background: #ff6b00; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-family: inherit;';
+                closeBtn.onclick = () => this.hideLeaderboard();
+                modal.appendChild(closeBtn);
+
+                modal.style.display = 'block';
+            }
+
+            hideLeaderboard() {
+                const modal = document.getElementById('leaderboardModal');
+                if (modal) modal.style.display = 'none';
+            }
+
+            // ==================== STATS ====================
+            loadLifetimeStats() {
+                try {
+                    const saved = localStorage.getItem('3jsAim_lifetimeStats');
+                    return saved ? JSON.parse(saved) : {
+                        gamesPlayed: 0,
+                        totalScore: 0,
+                        targetsHit: 0,
+                        targetsMissed: 0,
+                        bestStreak: 0,
+                        totalPlayTime: 0
+                    };
+                } catch (e) {
+                    return { gamesPlayed: 0, totalScore: 0, targetsHit: 0, targetsMissed: 0, bestStreak: 0, totalPlayTime: 0 };
+                }
+            }
+
+            saveLifetimeStats() {
+                try {
+                    localStorage.setItem('3jsAim_lifetimeStats', JSON.stringify(this.lifetimeStats));
+                } catch (e) {
+                    console.warn('Could not save lifetime stats');
+                }
+            }
+
+            updateStats(gameScore, hits, misses, streak) {
+                // Update session stats
+                this.sessionStats.gamesPlayed++;
+                this.sessionStats.totalScore += gameScore;
+                this.sessionStats.targetsHit += hits;
+                this.sessionStats.targetsMissed += misses;
+                if (streak > this.sessionStats.bestStreak) {
+                    this.sessionStats.bestStreak = streak;
+                }
+
+                // Update lifetime stats
+                this.lifetimeStats.gamesPlayed++;
+                this.lifetimeStats.totalScore += gameScore;
+                this.lifetimeStats.targetsHit += hits;
+                this.lifetimeStats.targetsMissed += misses;
+                if (streak > this.lifetimeStats.bestStreak) {
+                    this.lifetimeStats.bestStreak = streak;
+                }
+
+                this.saveLifetimeStats();
+            }
+
+            showStats() {
+                let modal = document.getElementById('statsModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'statsModal';
+                    modal.style.cssText = `
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0,0,0,0.95);
+                        padding: 30px;
+                        border-radius: 10px;
+                        color: #fff;
+                        min-width: 350px;
+                        z-index: 500;
+                        font-family: 'Courier New', monospace;
+                    `;
+                    document.getElementById('ui').appendChild(modal);
+                }
+
+                modal.textContent = '';
+
+                const header = document.createElement('h2');
+                header.textContent = 'STATISTICS';
+                header.style.cssText = 'color: #ff6b00; margin-bottom: 20px; text-align: center;';
+                modal.appendChild(header);
+
+                const createSection = (title, stats) => {
+                    const section = document.createElement('div');
+                    section.style.marginBottom = '20px';
+
+                    const sectionHeader = document.createElement('h3');
+                    sectionHeader.textContent = title;
+                    sectionHeader.style.cssText = 'color: #00ffff; margin-bottom: 10px;';
+                    section.appendChild(sectionHeader);
+
+                    const accuracy = stats.targetsHit + stats.targetsMissed > 0
+                        ? Math.round((stats.targetsHit / (stats.targetsHit + stats.targetsMissed)) * 100)
+                        : 0;
+
+                    const items = [
+                        ['Games Played', stats.gamesPlayed],
+                        ['Total Score', stats.totalScore],
+                        ['Targets Hit', stats.targetsHit],
+                        ['Targets Missed', stats.targetsMissed],
+                        ['Accuracy', accuracy + '%'],
+                        ['Best Streak', stats.bestStreak]
+                    ];
+
+                    items.forEach(([label, value]) => {
+                        const row = document.createElement('div');
+                        row.style.cssText = 'display: flex; justify-content: space-between; padding: 5px 0;';
+                        const labelSpan = document.createElement('span');
+                        labelSpan.textContent = label;
+                        labelSpan.style.color = '#aaa';
+                        const valueSpan = document.createElement('span');
+                        valueSpan.textContent = value;
+                        valueSpan.style.color = '#fff';
+                        row.appendChild(labelSpan);
+                        row.appendChild(valueSpan);
+                        section.appendChild(row);
+                    });
+
+                    return section;
+                };
+
+                modal.appendChild(createSection('Session Stats', this.sessionStats));
+                modal.appendChild(createSection('Lifetime Stats', this.lifetimeStats));
+
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = 'Close';
+                closeBtn.style.cssText = 'display: block; margin: 20px auto 0; padding: 10px 30px; background: #ff6b00; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-family: inherit;';
+                closeBtn.onclick = () => this.hideStats();
+                modal.appendChild(closeBtn);
+
+                modal.style.display = 'block';
+            }
+
+            hideStats() {
+                const modal = document.getElementById('statsModal');
+                if (modal) modal.style.display = 'none';
+            }
+
+            // ==================== ACHIEVEMENTS ====================
+            defineAchievements() {
+                return [
+                    { id: 'first_game', name: 'First Steps', desc: 'Complete your first game', icon: '🎮', check: (stats) => stats.gamesPlayed >= 1 },
+                    { id: 'score_100', name: 'Getting Started', desc: 'Score 100 points in a game', icon: '💯', check: (stats, game) => game >= 100 },
+                    { id: 'score_500', name: 'Sharp Shooter', desc: 'Score 500 points in a game', icon: '🎯', check: (stats, game) => game >= 500 },
+                    { id: 'score_1000', name: 'Elite', desc: 'Score 1000 points in a game', icon: '⭐', check: (stats, game) => game >= 1000 },
+                    { id: 'streak_5', name: 'On Fire', desc: 'Get a 5 hit streak', icon: '🔥', check: (stats) => stats.bestStreak >= 5 },
+                    { id: 'streak_10', name: 'Unstoppable', desc: 'Get a 10 hit streak', icon: '💥', check: (stats) => stats.bestStreak >= 10 },
+                    { id: 'streak_20', name: 'Legendary', desc: 'Get a 20 hit streak', icon: '👑', check: (stats) => stats.bestStreak >= 20 },
+                    { id: 'games_10', name: 'Regular', desc: 'Play 10 games', icon: '🏃', check: (stats) => stats.gamesPlayed >= 10 },
+                    { id: 'games_50', name: 'Dedicated', desc: 'Play 50 games', icon: '💪', check: (stats) => stats.gamesPlayed >= 50 },
+                    { id: 'accuracy_80', name: 'Precise', desc: 'Achieve 80% accuracy in a game', icon: '🎯', check: (stats, game, hits, total) => total > 0 && (hits / total) >= 0.8 },
+                    { id: 'hits_100', name: 'Target Practice', desc: 'Hit 100 targets total', icon: '🎪', check: (stats) => stats.targetsHit >= 100 },
+                    { id: 'hits_1000', name: 'Veteran', desc: 'Hit 1000 targets total', icon: '🏆', check: (stats) => stats.targetsHit >= 1000 }
+                ];
+            }
+
+            loadAchievements() {
+                try {
+                    const saved = localStorage.getItem('3jsAim_achievements');
+                    return saved ? JSON.parse(saved) : [];
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            saveAchievements() {
+                try {
+                    localStorage.setItem('3jsAim_achievements', JSON.stringify(this.unlockedAchievements));
+                } catch (e) {
+                    console.warn('Could not save achievements');
+                }
+            }
+
+            checkAchievements(gameScore, hits, misses) {
+                const total = hits + misses;
+                const newUnlocks = [];
+
+                this.achievements.forEach(achievement => {
+                    if (this.unlockedAchievements.includes(achievement.id)) return;
+
+                    if (achievement.check(this.lifetimeStats, gameScore, hits, total)) {
+                        this.unlockedAchievements.push(achievement.id);
+                        newUnlocks.push(achievement);
+                    }
+                });
+
+                if (newUnlocks.length > 0) {
+                    this.saveAchievements();
+                    newUnlocks.forEach(ach => this.showAchievementNotification(ach));
+                }
+            }
+
+            showAchievementNotification(achievement) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #2c3e50, #1a252f);
+                    border: 2px solid #ffd700;
+                    border-radius: 10px;
+                    padding: 15px 20px;
+                    color: #fff;
+                    font-family: 'Courier New', monospace;
+                    z-index: 1000;
+                    animation: slideIn 0.5s ease-out;
+                    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+                `;
+
+                const icon = document.createElement('span');
+                icon.textContent = achievement.icon;
+                icon.style.cssText = 'font-size: 24px; margin-right: 10px;';
+                notification.appendChild(icon);
+
+                const text = document.createElement('div');
+                text.style.cssText = 'display: inline-block; vertical-align: middle;';
+
+                const title = document.createElement('div');
+                title.textContent = 'Achievement Unlocked!';
+                title.style.cssText = 'color: #ffd700; font-size: 12px;';
+                text.appendChild(title);
+
+                const name = document.createElement('div');
+                name.textContent = achievement.name;
+                name.style.cssText = 'font-size: 16px; font-weight: bold;';
+                text.appendChild(name);
+
+                notification.appendChild(text);
+                document.body.appendChild(notification);
+
+                this.playSound('powerup');
+
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s';
+                    setTimeout(() => notification.remove(), 500);
+                }, 3500);
+            }
+
+            showAchievements() {
+                let modal = document.getElementById('achievementsModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'achievementsModal';
+                    modal.style.cssText = `
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0,0,0,0.95);
+                        padding: 30px;
+                        border-radius: 10px;
+                        color: #fff;
+                        min-width: 400px;
+                        max-height: 70vh;
+                        overflow-y: auto;
+                        z-index: 500;
+                        font-family: 'Courier New', monospace;
+                    `;
+                    document.getElementById('ui').appendChild(modal);
+                }
+
+                modal.textContent = '';
+
+                const header = document.createElement('h2');
+                header.textContent = 'ACHIEVEMENTS';
+                header.style.cssText = 'color: #ff6b00; margin-bottom: 20px; text-align: center;';
+                modal.appendChild(header);
+
+                const progress = document.createElement('p');
+                progress.textContent = this.unlockedAchievements.length + '/' + this.achievements.length + ' Unlocked';
+                progress.style.cssText = 'color: #888; text-align: center; margin-bottom: 20px;';
+                modal.appendChild(progress);
+
+                this.achievements.forEach(ach => {
+                    const row = document.createElement('div');
+                    const isUnlocked = this.unlockedAchievements.includes(ach.id);
+                    row.style.cssText = `
+                        display: flex;
+                        align-items: center;
+                        padding: 10px;
+                        margin: 5px 0;
+                        background: ${isUnlocked ? 'rgba(255, 215, 0, 0.1)' : 'rgba(100, 100, 100, 0.2)'};
+                        border-radius: 5px;
+                        border-left: 3px solid ${isUnlocked ? '#ffd700' : '#444'};
+                    `;
+
+                    const icon = document.createElement('span');
+                    icon.textContent = isUnlocked ? ach.icon : '🔒';
+                    icon.style.cssText = 'font-size: 24px; margin-right: 15px; filter: ' + (isUnlocked ? 'none' : 'grayscale(1)') + ';';
+                    row.appendChild(icon);
+
+                    const info = document.createElement('div');
+                    const name = document.createElement('div');
+                    name.textContent = ach.name;
+                    name.style.cssText = 'font-weight: bold; color: ' + (isUnlocked ? '#ffd700' : '#666') + ';';
+                    info.appendChild(name);
+
+                    const desc = document.createElement('div');
+                    desc.textContent = ach.desc;
+                    desc.style.cssText = 'font-size: 12px; color: ' + (isUnlocked ? '#aaa' : '#555') + ';';
+                    info.appendChild(desc);
+
+                    row.appendChild(info);
+                    modal.appendChild(row);
+                });
+
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = 'Close';
+                closeBtn.style.cssText = 'display: block; margin: 20px auto 0; padding: 10px 30px; background: #ff6b00; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-family: inherit;';
+                closeBtn.onclick = () => this.hideAchievements();
+                modal.appendChild(closeBtn);
+
+                modal.style.display = 'block';
+            }
+
+            hideAchievements() {
+                const modal = document.getElementById('achievementsModal');
+                if (modal) modal.style.display = 'none';
+            }
+
+            saveScore(mode, score, playerName = 'Player') {
+                if (!this.leaderboard[mode]) {
+                    this.leaderboard[mode] = [];
+                }
+
+                this.leaderboard[mode].push({
+                    score,
+                    name: playerName,
+                    date: new Date().toISOString(),
+                    difficulty: this.settings.difficulty
+                });
+
+                this.leaderboard[mode].sort((a, b) => b.score - a.score);
+                this.leaderboard[mode] = this.leaderboard[mode].slice(0, 10);
+
+                try {
+                    localStorage.setItem('3jsAim_leaderboard', JSON.stringify(this.leaderboard));
+                } catch (e) {
+                    console.warn('Could not save leaderboard');
+                }
+            }
+
+            getHighScore(mode) {
+                const scores = this.leaderboard[mode];
+                return scores && scores.length > 0 ? scores[0].score : 0;
+            }
+
+            // ==================== COLORBLIND ====================
+            getColor(colorKey) {
+                const palette = this.colorPalettes[this.settings.colorblindMode] || this.colorPalettes.off;
+                return palette[colorKey] || '#ffffff';
+            }
+
+            // ==================== DIFFICULTY ====================
+            getDifficultyModifier() {
+                return this.difficultyModifiers[this.settings.difficulty] || this.difficultyModifiers.medium;
+            }
+
             startGame() {
+                this.playSound('gameStart');
+                this.startMusic();
                 this.gameState = 'playing';
                 this.score = 0;
                 this.isRunning = true;
@@ -836,15 +2326,118 @@
             }
 
             endGame() {
+                this.playSound('gameEnd');
+                this.stopMusic();
                 this.gameState = 'ended';
                 this.isRunning = false;
-                
+
                 if (document.pointerLockElement) {
                     document.exitPointerLock();
                 }
-                
-                this.showEndScreen(this.score);
+
+                // Update stats and check achievements
+                this.updateStats(this.score, this.roundStats.targetsHit, this.roundStats.targetsMissed, this.maxStreak);
+                this.checkAchievements(this.score, this.roundStats.targetsHit, this.roundStats.targetsMissed);
+
+                // Check if this is a top 10 score
+                const currentScores = this.leaderboard[this.currentMode] || [];
+                const isHighScore = currentScores.length < 10 || this.score > (currentScores[currentScores.length - 1]?.score || 0);
+
+                if (isHighScore && this.score > 0) {
+                    this.showNameInput(this.score);
+                } else {
+                    this.saveScore(this.currentMode, this.score);
+                    this.showEndScreen(this.score);
+                }
+
                 console.log('Game ended, score:', this.score);
+            }
+
+            showNameInput(score) {
+                let modal = document.getElementById('nameInputModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'nameInputModal';
+                    modal.style.cssText = `
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0,0,0,0.95);
+                        padding: 30px;
+                        border-radius: 10px;
+                        color: #fff;
+                        text-align: center;
+                        z-index: 500;
+                        font-family: 'Courier New', monospace;
+                    `;
+                    document.getElementById('ui').appendChild(modal);
+                }
+
+                modal.textContent = '';
+
+                const header = document.createElement('h2');
+                header.textContent = 'NEW HIGH SCORE!';
+                header.style.cssText = 'color: #ffd700; margin-bottom: 10px;';
+                modal.appendChild(header);
+
+                const scoreText = document.createElement('p');
+                scoreText.textContent = 'Score: ' + score;
+                scoreText.style.cssText = 'font-size: 24px; color: #ff6b00; margin-bottom: 20px;';
+                modal.appendChild(scoreText);
+
+                const label = document.createElement('label');
+                label.textContent = 'Enter your name:';
+                label.style.cssText = 'display: block; margin-bottom: 10px;';
+                modal.appendChild(label);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'playerNameInput';
+                input.maxLength = 15;
+                input.placeholder = 'Player';
+                input.style.cssText = `
+                    width: 200px;
+                    padding: 10px;
+                    font-size: 16px;
+                    border: 2px solid #ff6b00;
+                    border-radius: 5px;
+                    background: #222;
+                    color: #fff;
+                    text-align: center;
+                    font-family: inherit;
+                `;
+                modal.appendChild(input);
+
+                const submitBtn = document.createElement('button');
+                submitBtn.textContent = 'Submit';
+                submitBtn.style.cssText = `
+                    display: block;
+                    margin: 20px auto 0;
+                    padding: 10px 40px;
+                    background: #ff6b00;
+                    color: #fff;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    font-family: inherit;
+                `;
+                submitBtn.onclick = () => {
+                    const name = input.value.trim() || 'Player';
+                    this.saveScore(this.currentMode, score, name);
+                    modal.style.display = 'none';
+                    this.showEndScreen(score);
+                };
+                modal.appendChild(submitBtn);
+
+                // Handle enter key
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') submitBtn.click();
+                });
+
+                modal.style.display = 'block';
+                setTimeout(() => input.focus(), 100);
             }
             
             restartGame() {
@@ -988,6 +2581,14 @@
                 this.updateStreakInfo();
                 this.updateMultiplierInfo();
 
+                // Update integrated systems
+                this.updateScreenShake(deltaTime);
+                this.updateHitMarkers();
+                this.updateFloatingNumbers();
+                this.updateParticles(deltaTime);
+                this.updatePowerUps(deltaTime * 1000); // Convert to ms
+                this.updateFps(deltaTime * 1000);
+
                 // Update wave timer
                 this.waveTimeRemaining -= deltaTime;
                 this.gameTime = this.waveTimeRemaining;
@@ -998,7 +2599,7 @@
                 }
 
                 // Debug info
-                this.ui.debug.textContent = `Wave ${this.currentWave} | Streak: ${this.streakCount} | x${this.scoreMultiplier.toFixed(1)}`;
+                this.ui.debug.textContent = 'Wave ' + this.currentWave + ' | Streak: ' + this.streakCount + ' | x' + this.scoreMultiplier.toFixed(1);
             }
 
             applyTargetPatterns(deltaTime) {
@@ -1214,35 +2815,50 @@
             }
             
             shoot() {
+                // Play shoot sound and add screen shake
+                this.playSound('shoot');
+                this.addScreenShake(0.02, 80);
+
                 // Cast ray in the direction player is looking
                 const rayResult = this.castRay(this.player.angle);
                 const maxRange = 300;
-                
+
                 // Check if we hit a wall too close
                 if (rayResult.distance < 50) {
                     this.showMessage('Too close to wall!', '#FFFF00');
+                    this.playSound('miss');
                     return;
                 }
-                
+
                 // Get all objects in range and in front of player
                 const objectsInRange = [];
-                
+
+                // Apply difficulty modifier to hit cone
+                const diffMod = this.getDifficultyModifier();
+                const baseCone = 0.1;
+                let hitCone = baseCone * diffMod.targetSize;
+
+                // Auto-aim power-up widens hit cone by 50%
+                if (this.getPowerUpModifier('auto_aim')) {
+                    hitCone *= 1.5;
+                }
+
                 // Check circles
                 this.circles.forEach((circle, index) => {
                     const dx = circle.x - this.player.x;
                     const dy = circle.y - this.player.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    
+
                     if (distance <= maxRange) {
                         const objAngle = Math.atan2(dy, dx);
                         let angleDiff = objAngle - this.player.angle;
-                        
+
                         // Normalize angle
                         while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
                         while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
-                        
+
                         // Check if in crosshair range (narrow cone)
-                        if (Math.abs(angleDiff) < 0.1) { // ~6 degree cone
+                        if (Math.abs(angleDiff) < hitCone) {
                             objectsInRange.push({
                                 type: 'circle',
                                 index: index,
@@ -1252,23 +2868,23 @@
                         }
                     }
                 });
-                
+
                 // Check NPCs
                 this.npcs.forEach((npc, index) => {
                     const dx = npc.x - this.player.x;
                     const dy = npc.y - this.player.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    
+
                     if (distance <= maxRange) {
                         const objAngle = Math.atan2(dy, dx);
                         let angleDiff = objAngle - this.player.angle;
-                        
+
                         // Normalize angle
                         while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
                         while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
-                        
+
                         // Check if in crosshair range
-                        if (Math.abs(angleDiff) < 0.1) {
+                        if (Math.abs(angleDiff) < hitCone) {
                             objectsInRange.push({
                                 type: 'npc',
                                 index: index,
@@ -1278,32 +2894,62 @@
                         }
                     }
                 });
-                
+
                 // Sort by distance (closest first)
                 objectsInRange.sort((a, b) => a.distance - b.distance);
-                
+
                 // Hit the closest object
                 if (objectsInRange.length > 0) {
                     const hit = objectsInRange[0];
 
                     if (hit.type === 'circle') {
                         // Use new scoring with multiplier
-                        const points = this.onTargetHit();
+                        let points = this.onTargetHit();
+
+                        // Apply double points power-up
+                        if (this.getPowerUpModifier('double_points')) {
+                            points *= 2;
+                        }
+
                         this.score += points;
                         this.updateScore(this.score);
                         this.circles.splice(hit.index, 1);
-                        this.showMessage(`+${points}`, '#00FF00');
+
+                        // Play hit sound and show kill marker (target destroyed)
+                        this.playSound('hit');
+                        this.addHitMarker('kill');
+                        this.addFloatingNumber(points, true);
+                        this.spawnParticles('destroy', null, null, hit.object.color, 12);
+
+                        // Play combo sound if on a streak
+                        if (this.streakCount >= 3 && this.streakCount % 3 === 0) {
+                            this.playSound('combo', { streak: this.streakCount });
+                        }
+
                         console.log('Hit circle! Score:', this.score, 'Streak:', this.streakCount);
                     } else if (hit.type === 'npc') {
-                        this.score -= 1;
-                        this.updateScore(this.score);
-                        this.breakStreak();
-                        this.showMessage('-1 Point', '#FF0000');
-                        console.log('Hit NPC! Score:', this.score);
+                        // Shield power-up protects against NPC penalties
+                        if (this.getPowerUpModifier('shield')) {
+                            this.showMessage('Shielded!', '#2ecc71');
+                            this.addHitMarker('hit'); // Use hit marker instead of miss
+                            this.playSound('powerup');
+                            console.log('Shield blocked NPC penalty');
+                        } else {
+                            this.score -= 1;
+                            this.updateScore(this.score);
+                            this.breakStreak();
+                            this.addHitMarker('miss');
+                            this.addFloatingNumber(1, false);
+                            this.playSound('miss');
+                            console.log('Hit NPC! Score:', this.score);
+                        }
                     }
                 } else {
                     this.breakStreak();
-                    this.showMessage('Miss!', '#888888');
+                    this.addHitMarker('miss');
+                    this.playSound('miss');
+                    // Spawn spark particles for wall impact
+                    this.spawnParticles('spark', null, null, '#ffff88', 6);
                 }
             }
             
@@ -1331,15 +2977,26 @@
             }
             
             render() {
+                // Apply screen shake offset
+                this.ctx.save();
+                this.ctx.translate(this.shakeOffset.x, this.shakeOffset.y);
+
                 // Clear canvas
                 this.ctx.fillStyle = '#87CEEB';
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                
+
                 // Render 3D-like view using raycasting
                 this.renderRaycasting();
-                
+
                 // Render 2D minimap
                 this.renderMinimap();
+
+                this.ctx.restore();
+
+                // Render hit markers (not affected by screen shake)
+                this.renderHitMarkers();
+                this.renderFloatingNumbers();
+                this.renderParticles();
             }
             
             renderRaycasting() {
@@ -1525,12 +3182,12 @@
             renderCrosshair() {
                 const centerX = this.canvas.width / 2;
                 const centerY = this.canvas.height / 2;
-                const size = 20;
-                
+                const size = this.settings.crosshairSize;
+
                 // Check if aiming at target
-                let crosshairColor = '#ffffff';
+                let crosshairColor = this.settings.crosshairColor;
                 const objectsInRange = this.getObjectsInCrosshair();
-                
+
                 if (objectsInRange.length > 0) {
                     if (objectsInRange[0].type === 'circle') {
                         crosshairColor = '#00ff00'; // Green for circles
@@ -1538,28 +3195,68 @@
                         crosshairColor = '#ff0000'; // Red for NPCs
                     }
                 }
-                
+
                 this.ctx.strokeStyle = crosshairColor;
+                this.ctx.fillStyle = crosshairColor;
                 this.ctx.lineWidth = 2;
                 this.ctx.shadowColor = '#000000';
                 this.ctx.shadowBlur = 3;
-                
-                // Draw crosshair
-                this.ctx.beginPath();
-                // Horizontal line
-                this.ctx.moveTo(centerX - size, centerY);
-                this.ctx.lineTo(centerX + size, centerY);
-                // Vertical line  
-                this.ctx.moveTo(centerX, centerY - size);
-                this.ctx.lineTo(centerX, centerY + size);
-                this.ctx.stroke();
-                
-                // Draw center dot
-                this.ctx.fillStyle = crosshairColor;
-                this.ctx.beginPath();
-                this.ctx.arc(centerX, centerY, 2, 0, Math.PI * 2);
-                this.ctx.fill();
-                
+
+                const style = this.settings.crosshairStyle;
+
+                switch (style) {
+                    case 'dot':
+                        // Just a center dot
+                        this.ctx.beginPath();
+                        this.ctx.arc(centerX, centerY, size / 5, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        break;
+
+                    case 'circle':
+                        // Circle outline with center dot
+                        this.ctx.beginPath();
+                        this.ctx.arc(centerX, centerY, size, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                        this.ctx.beginPath();
+                        this.ctx.arc(centerX, centerY, 2, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        break;
+
+                    case 'plus':
+                        // Plus sign with gap
+                        const gap = size * 0.3;
+                        this.ctx.beginPath();
+                        // Horizontal lines
+                        this.ctx.moveTo(centerX - size, centerY);
+                        this.ctx.lineTo(centerX - gap, centerY);
+                        this.ctx.moveTo(centerX + gap, centerY);
+                        this.ctx.lineTo(centerX + size, centerY);
+                        // Vertical lines
+                        this.ctx.moveTo(centerX, centerY - size);
+                        this.ctx.lineTo(centerX, centerY - gap);
+                        this.ctx.moveTo(centerX, centerY + gap);
+                        this.ctx.lineTo(centerX, centerY + size);
+                        this.ctx.stroke();
+                        break;
+
+                    case 'cross':
+                    default:
+                        // Standard cross
+                        this.ctx.beginPath();
+                        // Horizontal line
+                        this.ctx.moveTo(centerX - size, centerY);
+                        this.ctx.lineTo(centerX + size, centerY);
+                        // Vertical line
+                        this.ctx.moveTo(centerX, centerY - size);
+                        this.ctx.lineTo(centerX, centerY + size);
+                        this.ctx.stroke();
+                        // Center dot
+                        this.ctx.beginPath();
+                        this.ctx.arc(centerX, centerY, 2, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        break;
+                }
+
                 this.ctx.shadowBlur = 0;
             }
             
@@ -1747,12 +3444,191 @@
             }
         }
 
+        // Difficulty selection
+        function selectDifficulty(difficulty) {
+            if (game) {
+                game.settings.difficulty = difficulty;
+                game.saveSettings();
+
+                // Update button styles
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                const selectedBtn = document.getElementById('diff-' + difficulty);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('active');
+                }
+            }
+        }
+
+        // Settings toggle for main menu
+        function toggleMenuSettings() {
+            const panel = document.getElementById('settingsPanel');
+            if (panel) {
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // Leaderboard functions
+        function showLeaderboard() {
+            if (game) {
+                game.showLeaderboard();
+            }
+        }
+
+        function hideLeaderboard() {
+            if (game) {
+                game.hideLeaderboard();
+            }
+        }
+
+        // Stats functions
+        function showStats() {
+            if (game) {
+                game.showStats();
+            }
+        }
+
+        function hideStats() {
+            if (game) {
+                game.hideStats();
+            }
+        }
+
+        // Achievement functions
+        function showAchievements() {
+            if (game) {
+                game.showAchievements();
+            }
+        }
+
+        function hideAchievements() {
+            if (game) {
+                game.hideAchievements();
+            }
+        }
+
+        // Settings toggle for pause menu
+        function toggleSettings() {
+            const panel = document.getElementById('pauseSettings');
+            if (panel) {
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // Update sensitivity setting
+        function updateSensitivity(value) {
+            if (game) {
+                game.settings.sensitivity = value / 25000;
+                game.saveSettings();
+            }
+        }
+
+        // Update volume setting
+        function updateVolume(value) {
+            if (game) {
+                game.settings.volume = value / 100;
+                game.saveSettings();
+            }
+        }
+
+        // Update music volume setting
+        function updateMusicVolume(value) {
+            if (game) {
+                game.settings.musicVolume = value / 100;
+                game.updateMusicVolume();
+                game.saveSettings();
+            }
+        }
+
+        // Update music enabled setting
+        function updateMusicEnabled(value) {
+            if (game) {
+                game.settings.musicEnabled = value === 'on';
+                if (!game.settings.musicEnabled) {
+                    game.stopMusic();
+                } else if (game.gameState === 'playing') {
+                    game.startMusic();
+                }
+                game.saveSettings();
+            }
+        }
+
+        // Update screen shake setting
+        function updateShake(value) {
+            if (game) {
+                game.settings.screenShake = value === 'on';
+                game.saveSettings();
+            }
+        }
+
+        // Update colorblind mode
+        function updateColorblind(value) {
+            if (game) {
+                game.settings.colorblindMode = value;
+                game.saveSettings();
+            }
+        }
+
+        // Update FPS display setting
+        function updateFpsDisplay(value) {
+            if (game) {
+                game.settings.showFps = value === 'on';
+                game.saveSettings();
+                if (game.ui.fpsCounter) {
+                    game.ui.fpsCounter.classList.toggle('hidden', !game.settings.showFps);
+                }
+            }
+        }
+
+        // Update crosshair style
+        function updateCrosshairStyle(value) {
+            if (game) {
+                game.settings.crosshairStyle = value;
+                game.saveSettings();
+            }
+        }
+
+        // Update crosshair color
+        function updateCrosshairColor(value) {
+            if (game) {
+                game.settings.crosshairColor = value;
+                game.saveSettings();
+            }
+        }
+
+        // Update crosshair size
+        function updateCrosshairSize(value) {
+            if (game) {
+                game.settings.crosshairSize = parseInt(value);
+                game.saveSettings();
+            }
+        }
+
+        // Pause menu functions
+        function resumeGame() {
+            if (game) {
+                game.resumeGame();
+            }
+        }
+
+        function quitToMenu() {
+            if (game) {
+                game.gameState = 'menu';
+                game.isRunning = false;
+                document.exitPointerLock();
+                if (game.ui.pauseMenu) game.ui.pauseMenu.style.display = 'none';
+                game.hideGameUI();
+                game.ui.menu.style.display = 'block';
+            }
+        }
+
         // Initialize game when page loads
         window.addEventListener('load', () => {
             try {
                 console.log('Initializing Canvas FPS Game...');
                 game = new CanvasFPSGame();
-                console.log('Game initialized successfully!');
+                console.log('Game initialized successfully with integrated features!');
             } catch (error) {
                 console.error('Failed to initialize game:', error);
                 alert('Failed to load game: ' + error.message);

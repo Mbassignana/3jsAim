@@ -355,18 +355,14 @@ export class CanvasFPSGame extends EventEmitter {
       if (!this.isWall(this.player.x, newY)) this.player.y = newY;
     }
     if (this.keys['a']) {
-      const newX =
-        this.player.x + Math.cos(this.player.angle - Math.PI / 2) * moveSpeed;
-      const newY =
-        this.player.y + Math.sin(this.player.angle - Math.PI / 2) * moveSpeed;
+      const newX = this.player.x + Math.cos(this.player.angle - Math.PI / 2) * moveSpeed;
+      const newY = this.player.y + Math.sin(this.player.angle - Math.PI / 2) * moveSpeed;
       if (!this.isWall(newX, this.player.y)) this.player.x = newX;
       if (!this.isWall(this.player.x, newY)) this.player.y = newY;
     }
     if (this.keys['d']) {
-      const newX =
-        this.player.x + Math.cos(this.player.angle + Math.PI / 2) * moveSpeed;
-      const newY =
-        this.player.y + Math.sin(this.player.angle + Math.PI / 2) * moveSpeed;
+      const newX = this.player.x + Math.cos(this.player.angle + Math.PI / 2) * moveSpeed;
+      const newY = this.player.y + Math.sin(this.player.angle + Math.PI / 2) * moveSpeed;
       if (!this.isWall(newX, this.player.y)) this.player.x = newX;
       if (!this.isWall(this.player.x, newY)) this.player.y = newY;
     }
@@ -382,12 +378,7 @@ export class CanvasFPSGame extends EventEmitter {
     const mapX = Math.floor(x / this.config.mapSize);
     const mapY = Math.floor(y / this.config.mapSize);
 
-    if (
-      mapX < 0 ||
-      mapX >= this.map[0].length ||
-      mapY < 0 ||
-      mapY >= this.map.length
-    ) {
+    if (mapX < 0 || mapX >= this.map[0].length || mapY < 0 || mapY >= this.map.length) {
       return true;
     }
 
@@ -402,11 +393,7 @@ export class CanvasFPSGame extends EventEmitter {
   spawnCircles(count) {
     const spawned = [];
 
-    for (
-      let i = 0;
-      i < count && this.circles.length < this.config.maxCircles;
-      i++
-    ) {
+    for (let i = 0; i < count && this.circles.length < this.config.maxCircles; i++) {
       const circle = this._createCircle();
 
       if (!this.isWall(circle.x, circle.y)) {
@@ -613,9 +600,10 @@ export class CanvasFPSGame extends EventEmitter {
       type: hit.type,
       index: hit.originalIndex,
       distance: hit.distance,
-      object: hit.type === TargetType.CIRCLE
-        ? this.circles[hit.originalIndex]
-        : this.npcs[hit.originalIndex],
+      object:
+        hit.type === TargetType.CIRCLE
+          ? this.circles[hit.originalIndex]
+          : this.npcs[hit.originalIndex],
     }));
   }
 
@@ -676,10 +664,7 @@ export class CanvasFPSGame extends EventEmitter {
     this.player.pitch -= movementY * sensitivity;
 
     // Clamp pitch
-    this.player.pitch = Math.max(
-      -Math.PI / 2,
-      Math.min(Math.PI / 2, this.player.pitch)
-    );
+    this.player.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.player.pitch));
   }
 
   /**

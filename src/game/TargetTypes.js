@@ -232,10 +232,20 @@ export const MovementPatterns = {
     // Move in current direction
     const delta = config.speed * 0.016; // Assume 60fps for calculation
     return {
-      x: Math.max(startPos.x - config.amplitude, Math.min(startPos.x + config.amplitude,
-        (state.currentPos?.x ?? startPos.x) + state.direction.x * delta)),
-      y: Math.max(startPos.y - config.amplitude, Math.min(startPos.y + config.amplitude,
-        (state.currentPos?.y ?? startPos.y) + state.direction.y * delta)),
+      x: Math.max(
+        startPos.x - config.amplitude,
+        Math.min(
+          startPos.x + config.amplitude,
+          (state.currentPos?.x ?? startPos.x) + state.direction.x * delta
+        )
+      ),
+      y: Math.max(
+        startPos.y - config.amplitude,
+        Math.min(
+          startPos.y + config.amplitude,
+          (state.currentPos?.y ?? startPos.y) + state.direction.y * delta
+        )
+      ),
       z: startPos.z,
     };
   },
@@ -256,9 +266,10 @@ export class TargetFactory {
    * @returns {TargetInstance}
    */
   static create(type, position, options = {}) {
-    const config = typeof type === 'string'
-      ? TargetTypes[type.toUpperCase()] || Object.values(TargetTypes).find((t) => t.id === type)
-      : type;
+    const config =
+      typeof type === 'string'
+        ? TargetTypes[type.toUpperCase()] || Object.values(TargetTypes).find((t) => t.id === type)
+        : type;
 
     if (!config) {
       throw new Error(`Unknown target type: ${type}`);
@@ -346,59 +357,57 @@ export class TargetFactory {
     };
 
     switch (config.behavior.type) {
-    case 'moving':
-      state.pattern = options.pattern ?? config.behavior.pattern;
-      state.currentPos = null;
-      state.direction = null;
-      state.lastDirectionChange = 0;
-      break;
+      case 'moving':
+        state.pattern = options.pattern ?? config.behavior.pattern;
+        state.currentPos = null;
+        state.direction = null;
+        state.lastDirectionChange = 0;
+        break;
 
-    case 'shrinking':
-      state.currentRadius = config.baseRadius;
-      break;
+      case 'shrinking':
+        state.currentRadius = config.baseRadius;
+        break;
 
-    case 'bonus':
-      state.isFlashing = false;
-      state.visible = true;
-      break;
+      case 'bonus':
+        state.isFlashing = false;
+        state.visible = true;
+        break;
 
-    case 'split':
-      state.splitDepth = options.splitDepth ?? 0;
-      state.velocity = options.velocity ?? { x: 0, y: 0, z: 0 };
-      state.isChild = false;
-      break;
+      case 'split':
+        state.splitDepth = options.splitDepth ?? 0;
+        state.velocity = options.velocity ?? { x: 0, y: 0, z: 0 };
+        state.isChild = false;
+        break;
 
-    case 'armored':
-      state.isFlashing = false;
-      state.flashEndTime = 0;
-      break;
+      case 'armored':
+        state.isFlashing = false;
+        state.flashEndTime = 0;
+        break;
 
-    case 'ghost':
-      state.opacity = 1.0;
-      state.isVisible = true;
-      state.phaseTime = 0;
-      break;
+      case 'ghost':
+        state.opacity = 1.0;
+        state.isVisible = true;
+        state.phaseTime = 0;
+        break;
 
-    case 'streak': {
-      state.direction = options.direction ?? {
-        x: (Math.random() - 0.5) * 2,
-        y: (Math.random() - 0.5) * 2,
-        z: 0,
-      };
-      // Normalize direction
-      const mag = Math.sqrt(
-        state.direction.x ** 2 +
-        state.direction.y ** 2 +
-        state.direction.z ** 2,
-      );
-      if (mag > 0) {
-        state.direction.x /= mag;
-        state.direction.y /= mag;
-        state.direction.z /= mag;
+      case 'streak': {
+        state.direction = options.direction ?? {
+          x: (Math.random() - 0.5) * 2,
+          y: (Math.random() - 0.5) * 2,
+          z: 0,
+        };
+        // Normalize direction
+        const mag = Math.sqrt(
+          state.direction.x ** 2 + state.direction.y ** 2 + state.direction.z ** 2
+        );
+        if (mag > 0) {
+          state.direction.x /= mag;
+          state.direction.y /= mag;
+          state.direction.z /= mag;
+        }
+        state.trail = [];
+        break;
       }
-      state.trail = [];
-      break;
-    }
     }
 
     return state;
@@ -607,33 +616,33 @@ export class TargetBehaviorManager extends EventEmitter {
     const behavior = target.config.behavior;
 
     switch (behavior.type) {
-    case 'static':
-      // No updates needed
-      return { shouldRemove: false };
+      case 'static':
+        // No updates needed
+        return { shouldRemove: false };
 
-    case 'moving':
-      return this._updateMovingTarget(target, deltaTime);
+      case 'moving':
+        return this._updateMovingTarget(target, deltaTime);
 
-    case 'shrinking':
-      return this._updateShrinkingTarget(target, deltaTime);
+      case 'shrinking':
+        return this._updateShrinkingTarget(target, deltaTime);
 
-    case 'bonus':
-      return this._updateBonusTarget(target, deltaTime);
+      case 'bonus':
+        return this._updateBonusTarget(target, deltaTime);
 
-    case 'split':
-      return this._updateSplitTarget(target, deltaTime);
+      case 'split':
+        return this._updateSplitTarget(target, deltaTime);
 
-    case 'armored':
-      return this._updateArmoredTarget(target, deltaTime);
+      case 'armored':
+        return this._updateArmoredTarget(target, deltaTime);
 
-    case 'ghost':
-      return this._updateGhostTarget(target, deltaTime);
+      case 'ghost':
+        return this._updateGhostTarget(target, deltaTime);
 
-    case 'streak':
-      return this._updateStreakTarget(target, deltaTime);
+      case 'streak':
+        return this._updateStreakTarget(target, deltaTime);
 
-    default:
-      return { shouldRemove: false };
+      default:
+        return { shouldRemove: false };
     }
   }
 

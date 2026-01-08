@@ -363,9 +363,7 @@ describe('TargetingSystem', () => {
         const mockScene = { children: [] };
         const target = { userData: { type: 'circle' } };
 
-        mockRaycaster.intersectObjects.mockReturnValue([
-          { object: target, distance: 50 },
-        ]);
+        mockRaycaster.intersectObjects.mockReturnValue([{ object: target, distance: 50 }]);
 
         const hit = strategy.checkTarget({}, target, { camera: mockCamera, scene: mockScene });
 

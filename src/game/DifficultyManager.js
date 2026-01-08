@@ -256,16 +256,10 @@ export class DifficultyManager extends EventEmitter {
     const factor = Math.max(0, Math.min(1, performanceFactor));
 
     // Scale spawn interval (lower = harder)
-    settings.spawnInterval = Math.max(
-      10,
-      settings.spawnInterval * (1 - factor * 0.3)
-    );
+    settings.spawnInterval = Math.max(10, settings.spawnInterval * (1 - factor * 0.3));
 
     // Scale circle lifetime (lower = harder)
-    settings.circleLifetime = Math.max(
-      20000,
-      settings.circleLifetime * (1 - factor * 0.2)
-    );
+    settings.circleLifetime = Math.max(20000, settings.circleLifetime * (1 - factor * 0.2));
 
     // Scale circle speed (higher = harder)
     settings.circleSpeed = settings.circleSpeed * (1 + factor * 0.3);

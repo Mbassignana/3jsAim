@@ -290,7 +290,11 @@ export const Achievements = {
     icon: '📚',
     category: AchievementCategories.SPECIAL,
     rarity: AchievementRarity.COMMON,
-    condition: { type: ConditionTypes.TUTORIAL_COMPLETE, target: 1, params: { tutorial: 'basics' } },
+    condition: {
+      type: ConditionTypes.TUTORIAL_COMPLETE,
+      target: 1,
+      params: { tutorial: 'basics' },
+    },
   },
 
   GRADUATE: {
@@ -300,7 +304,11 @@ export const Achievements = {
     icon: '🎓',
     category: AchievementCategories.SPECIAL,
     rarity: AchievementRarity.UNCOMMON,
-    condition: { type: ConditionTypes.TUTORIAL_COMPLETE, target: 1, params: { tutorial: 'advanced' } },
+    condition: {
+      type: ConditionTypes.TUTORIAL_COMPLETE,
+      target: 1,
+      params: { tutorial: 'advanced' },
+    },
   },
 
   PRECISION_MASTER: {
@@ -476,9 +484,7 @@ export class AchievementSystem extends EventEmitter {
    * @returns {Achievement[]}
    */
   getLockedAchievements() {
-    return Object.values(Achievements).filter((a) =>
-      !this.isUnlocked(a.id) && !a.hidden,
-    );
+    return Object.values(Achievements).filter((a) => !this.isUnlocked(a.id) && !a.hidden);
   }
 
   /**
@@ -497,12 +503,10 @@ export class AchievementSystem extends EventEmitter {
    * @returns {Array<{achievement: Achievement, timestamp: number}>}
    */
   getRecentUnlocks(limit = 5) {
-    return this._recentUnlocks
-      .slice(0, limit)
-      .map((r) => ({
-        achievement: Achievements[r.achievementId.toUpperCase()],
-        timestamp: r.timestamp,
-      }));
+    return this._recentUnlocks.slice(0, limit).map((r) => ({
+      achievement: Achievements[r.achievementId.toUpperCase()],
+      timestamp: r.timestamp,
+    }));
   }
 
   /**
@@ -510,9 +514,7 @@ export class AchievementSystem extends EventEmitter {
    * @returns {Object[]}
    */
   getUnlockedRewards() {
-    return Object.values(UnlockableRewards).filter((r) =>
-      this._unlockedRewards.has(r.id),
-    );
+    return Object.values(UnlockableRewards).filter((r) => this._unlockedRewards.has(r.id));
   }
 
   /**
@@ -611,7 +613,8 @@ export class AchievementSystem extends EventEmitter {
    * @private
    */
   _updateProgress(achievementId, value) {
-    const achievement = Achievements[achievementId.toUpperCase()] ||
+    const achievement =
+      Achievements[achievementId.toUpperCase()] ||
       Object.values(Achievements).find((a) => a.id === achievementId);
 
     if (!achievement) return;
@@ -642,9 +645,7 @@ export class AchievementSystem extends EventEmitter {
       });
 
       // Check for reward unlock
-      const reward = Object.values(UnlockableRewards).find(
-        (r) => r.unlockedBy === achievementId,
-      );
+      const reward = Object.values(UnlockableRewards).find((r) => r.unlockedBy === achievementId);
       if (reward && !this._unlockedRewards.has(reward.id)) {
         this._unlockedRewards.add(reward.id);
         this.emit('reward:unlocked', { reward, achievement });
@@ -673,106 +674,106 @@ export class AchievementSystem extends EventEmitter {
     const params = condition.params || {};
 
     switch (condition.type) {
-    case ConditionTypes.TOTAL_HITS:
-      if (eventType === 'hit' || eventType === 'game_complete') {
-        return this._lifetimeStats.totalHits + (this._sessionStats.hits || 0);
-      }
-      break;
-
-    case ConditionTypes.TOTAL_SCORE:
-      if (eventType === 'game_complete') {
-        return data.lifetimeStats?.totalScore || 0;
-      }
-      break;
-
-    case ConditionTypes.GAMES_PLAYED:
-      if (eventType === 'game_complete') {
-        return data.lifetimeStats?.gamesPlayed || 0;
-      }
-      break;
-
-    case ConditionTypes.ACCURACY_SINGLE:
-      if (eventType === 'game_complete' && data.hits > 0) {
-        const accuracy = (data.hits / (data.hits + data.misses)) * 100;
-        return accuracy;
-      }
-      break;
-
-    case ConditionTypes.COMBO_MAX:
-      if (eventType === 'combo' || eventType === 'game_complete') {
-        return data.combo || data.maxCombo || 0;
-      }
-      break;
-
-    case ConditionTypes.SCORE_SINGLE:
-      if (eventType === 'game_complete') {
-        return data.score || 0;
-      }
-      break;
-
-    case ConditionTypes.STREAK_HITS:
-      if (eventType === 'hit' || eventType === 'game_complete') {
-        return Math.max(this._sessionStats.currentStreak, data.maxStreak || 0);
-      }
-      break;
-
-    case ConditionTypes.SPEED_KILL:
-      if (eventType === 'hit' && data.reactionTime !== undefined) {
-        if (data.reactionTime <= condition.target) {
-          return condition.target; // Completed
+      case ConditionTypes.TOTAL_HITS:
+        if (eventType === 'hit' || eventType === 'game_complete') {
+          return this._lifetimeStats.totalHits + (this._sessionStats.hits || 0);
         }
-      }
-      break;
+        break;
 
-    case ConditionTypes.TUTORIAL_COMPLETE:
-      if (eventType === 'tutorial_complete') {
-        if (!params.tutorial || data.tutorialId === params.tutorial) {
-          return 1;
+      case ConditionTypes.TOTAL_SCORE:
+        if (eventType === 'game_complete') {
+          return data.lifetimeStats?.totalScore || 0;
         }
-      }
-      break;
+        break;
 
-    case ConditionTypes.MODE_WINS:
-      if (eventType === 'game_complete' && data.won) {
-        if (!params.mode || data.mode === params.mode) {
-          return 1;
+      case ConditionTypes.GAMES_PLAYED:
+        if (eventType === 'game_complete') {
+          return data.lifetimeStats?.gamesPlayed || 0;
         }
-      }
-      break;
+        break;
 
-    case ConditionTypes.WEAPON_KILLS:
-      if (eventType === 'hit') {
-        if (!params.weapon || data.weapon === params.weapon) {
-          const key = `weapon_${params.weapon || 'any'}`;
-          return (this._sessionStats[key] || 0) + 1;
+      case ConditionTypes.ACCURACY_SINGLE:
+        if (eventType === 'game_complete' && data.hits > 0) {
+          const accuracy = (data.hits / (data.hits + data.misses)) * 100;
+          return accuracy;
         }
-      }
-      break;
+        break;
 
-    case ConditionTypes.PERFECT_GAME:
-      if (eventType === 'game_complete') {
-        if (data.misses === 0 && data.hits >= condition.target) {
-          return data.hits;
+      case ConditionTypes.COMBO_MAX:
+        if (eventType === 'combo' || eventType === 'game_complete') {
+          return data.combo || data.maxCombo || 0;
         }
-      }
-      break;
+        break;
 
-    case ConditionTypes.MULTI_KILL:
-      if (eventType === 'multi_kill') {
-        if (data.count >= condition.target && data.timeWindow <= params.timeWindow) {
-          return condition.target;
+      case ConditionTypes.SCORE_SINGLE:
+        if (eventType === 'game_complete') {
+          return data.score || 0;
         }
-      }
-      break;
+        break;
 
-    case ConditionTypes.TIME_PLAYED:
-      if (eventType === 'game_complete') {
-        if (!params.mode || data.mode === params.mode) {
-          const minutes = (data.duration || 0) / 60;
-          return minutes;
+      case ConditionTypes.STREAK_HITS:
+        if (eventType === 'hit' || eventType === 'game_complete') {
+          return Math.max(this._sessionStats.currentStreak, data.maxStreak || 0);
         }
-      }
-      break;
+        break;
+
+      case ConditionTypes.SPEED_KILL:
+        if (eventType === 'hit' && data.reactionTime !== undefined) {
+          if (data.reactionTime <= condition.target) {
+            return condition.target; // Completed
+          }
+        }
+        break;
+
+      case ConditionTypes.TUTORIAL_COMPLETE:
+        if (eventType === 'tutorial_complete') {
+          if (!params.tutorial || data.tutorialId === params.tutorial) {
+            return 1;
+          }
+        }
+        break;
+
+      case ConditionTypes.MODE_WINS:
+        if (eventType === 'game_complete' && data.won) {
+          if (!params.mode || data.mode === params.mode) {
+            return 1;
+          }
+        }
+        break;
+
+      case ConditionTypes.WEAPON_KILLS:
+        if (eventType === 'hit') {
+          if (!params.weapon || data.weapon === params.weapon) {
+            const key = `weapon_${params.weapon || 'any'}`;
+            return (this._sessionStats[key] || 0) + 1;
+          }
+        }
+        break;
+
+      case ConditionTypes.PERFECT_GAME:
+        if (eventType === 'game_complete') {
+          if (data.misses === 0 && data.hits >= condition.target) {
+            return data.hits;
+          }
+        }
+        break;
+
+      case ConditionTypes.MULTI_KILL:
+        if (eventType === 'multi_kill') {
+          if (data.count >= condition.target && data.timeWindow <= params.timeWindow) {
+            return condition.target;
+          }
+        }
+        break;
+
+      case ConditionTypes.TIME_PLAYED:
+        if (eventType === 'game_complete') {
+          if (!params.mode || data.mode === params.mode) {
+            const minutes = (data.duration || 0) / 60;
+            return minutes;
+          }
+        }
+        break;
     }
 
     return null;
@@ -786,35 +787,35 @@ export class AchievementSystem extends EventEmitter {
    */
   _updateSessionStats(eventType, data) {
     switch (eventType) {
-    case 'hit':
-      this._sessionStats.hits++;
-      this._sessionStats.currentStreak++;
-      if (this._sessionStats.currentStreak > this._sessionStats.maxStreak) {
-        this._sessionStats.maxStreak = this._sessionStats.currentStreak;
-      }
+      case 'hit':
+        this._sessionStats.hits++;
+        this._sessionStats.currentStreak++;
+        if (this._sessionStats.currentStreak > this._sessionStats.maxStreak) {
+          this._sessionStats.maxStreak = this._sessionStats.currentStreak;
+        }
 
-      // Track weapon-specific hits
-      if (data.weapon) {
-        const key = `weapon_${data.weapon}`;
-        this._sessionStats[key] = (this._sessionStats[key] || 0) + 1;
-      }
+        // Track weapon-specific hits
+        if (data.weapon) {
+          const key = `weapon_${data.weapon}`;
+          this._sessionStats[key] = (this._sessionStats[key] || 0) + 1;
+        }
 
-      // Track reaction times
-      if (data.reactionTime !== undefined) {
-        this._sessionStats.reactionTimes.push(data.reactionTime);
-      }
-      break;
+        // Track reaction times
+        if (data.reactionTime !== undefined) {
+          this._sessionStats.reactionTimes.push(data.reactionTime);
+        }
+        break;
 
-    case 'miss':
-      this._sessionStats.misses++;
-      this._sessionStats.currentStreak = 0;
-      break;
+      case 'miss':
+        this._sessionStats.misses++;
+        this._sessionStats.currentStreak = 0;
+        break;
 
-    case 'combo':
-      if (data.combo > this._sessionStats.maxCombo) {
-        this._sessionStats.maxCombo = data.combo;
-      }
-      break;
+      case 'combo':
+        if (data.combo > this._sessionStats.maxCombo) {
+          this._sessionStats.maxCombo = data.combo;
+        }
+        break;
     }
   }
 

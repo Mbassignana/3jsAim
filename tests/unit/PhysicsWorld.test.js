@@ -357,9 +357,7 @@ describe('PhysicsWorld', () => {
       const callback = vi.fn();
       physics.on('physics:addBody', callback);
       physics.addGround();
-      expect(callback).toHaveBeenCalledWith(
-        expect.objectContaining({ type: BodyType.GROUND })
-      );
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ type: BodyType.GROUND }));
     });
 
     it('should return null if not initialized', () => {
@@ -433,9 +431,7 @@ describe('PhysicsWorld', () => {
       const callback = vi.fn();
       physics.on('physics:addBody', callback);
       physics.addPlayer(0, 2, 5);
-      expect(callback).toHaveBeenCalledWith(
-        expect.objectContaining({ type: BodyType.PLAYER })
-      );
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ type: BodyType.PLAYER }));
     });
   });
 
@@ -580,9 +576,7 @@ describe('PhysicsWorld', () => {
       const callback = vi.fn();
       physics.on('physics:addBody', callback);
       physics.addCircle(0, 0, 0, 1);
-      expect(callback).toHaveBeenCalledWith(
-        expect.objectContaining({ type: BodyType.CIRCLE })
-      );
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ type: BodyType.CIRCLE }));
     });
   });
 
@@ -637,9 +631,7 @@ describe('PhysicsWorld', () => {
       const callback = vi.fn();
       physics.on('physics:addBody', callback);
       physics.addNPC(0, 0, 0, 1, 1, 1);
-      expect(callback).toHaveBeenCalledWith(
-        expect.objectContaining({ type: BodyType.NPC })
-      );
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ type: BodyType.NPC }));
     });
   });
 

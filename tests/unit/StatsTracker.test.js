@@ -4,11 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import {
-  StatsTracker,
-  getStatsTracker,
-  resetStatsTracker,
-} from '@/game/StatsTracker.js';
+import { StatsTracker, getStatsTracker, resetStatsTracker } from '@/game/StatsTracker.js';
 
 // Mock localStorage
 function createMockStorage() {

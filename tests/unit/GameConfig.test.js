@@ -4,12 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 
-import {
-  GameConfig,
-  cloneConfig,
-  validateConfig,
-  mergeConfig,
-} from '@/game/GameConfig.js';
+import { GameConfig, cloneConfig, validateConfig, mergeConfig } from '@/game/GameConfig.js';
 
 describe('GameConfig', () => {
   describe('structure', () => {

@@ -164,7 +164,7 @@ class DamageNumber {
 
     // Pop effect for critical hits
     if (this.isCritical && this.elapsed < 100) {
-      this.scale = 1 + (0.3 * (1 - this.elapsed / 100));
+      this.scale = 1 + 0.3 * (1 - this.elapsed / 100);
     } else {
       this.scale = 1;
     }

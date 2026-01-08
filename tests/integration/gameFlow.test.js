@@ -10,7 +10,12 @@ import { HitMarker, resetHitMarker } from '@/effects/HitMarker.js';
 import { ScreenShake, resetScreenShake } from '@/effects/ScreenShake.js';
 import { resetAudioManager } from '@/game/AudioManager.js';
 import { ComboSystem, resetComboSystem } from '@/game/ComboSystem.js';
-import { DifficultyManager, DifficultyLevel, DifficultyPresets, resetDifficultyManager } from '@/game/DifficultyManager.js';
+import {
+  DifficultyManager,
+  DifficultyLevel,
+  DifficultyPresets,
+  resetDifficultyManager,
+} from '@/game/DifficultyManager.js';
 import { GameConfig } from '@/game/GameConfig.js';
 import { InputManager, resetInputManager } from '@/game/InputManager.js';
 import { Leaderboard, resetLeaderboard } from '@/game/Leaderboard.js';
@@ -291,8 +296,9 @@ describe('Game Flow Integration', () => {
       const extremeMultiplier = difficultyManager.settings.scoreMultiplier;
 
       expect(extremeMultiplier).toBeGreaterThan(easyMultiplier);
-      expect(Math.floor(baseScore * extremeMultiplier))
-        .toBeGreaterThan(Math.floor(baseScore * easyMultiplier));
+      expect(Math.floor(baseScore * extremeMultiplier)).toBeGreaterThan(
+        Math.floor(baseScore * easyMultiplier)
+      );
     });
   });
 

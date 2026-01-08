@@ -95,9 +95,7 @@ describe('LODSystem', () => {
 
       lod.registerObject('test1', { x: 0, y: 0, z: 0 });
 
-      expect(handler).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'test1' })
-      );
+      expect(handler).toHaveBeenCalledWith(expect.objectContaining({ id: 'test1' }));
     });
 
     it('should accept mesh option', () => {

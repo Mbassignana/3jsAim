@@ -54,9 +54,9 @@ describe('StateMachine', () => {
     });
 
     it('should throw if initialState not in states', () => {
-      expect(
-        () => new StateMachine({ initialState: 'missing', states: { a: {} } })
-      ).toThrow('not found');
+      expect(() => new StateMachine({ initialState: 'missing', states: { a: {} } })).toThrow(
+        'not found'
+      );
     });
 
     it('should start in initial state', () => {
@@ -272,10 +272,7 @@ describe('StateMachine', () => {
     it('should call onUpdate of current state', () => {
       sm.transition('start');
       sm.update(0.016);
-      expect(sm._states.running.onUpdate).toHaveBeenCalledWith(
-        expect.any(Object),
-        0.016
-      );
+      expect(sm._states.running.onUpdate).toHaveBeenCalledWith(expect.any(Object), 0.016);
     });
 
     it('should not throw if state has no onUpdate', () => {

@@ -90,7 +90,14 @@ export class Leaderboard extends EventEmitter {
    * @param {string} [params.gameMode='default'] - Game mode
    * @returns {{rank: number, isHighScore: boolean, entry: LeaderboardEntry}}
    */
-  addScore({ name, score, accuracy = 0, maxCombo = 0, difficulty = 'medium', gameMode = 'default' }) {
+  addScore({
+    name,
+    score,
+    accuracy = 0,
+    maxCombo = 0,
+    difficulty = 'medium',
+    gameMode = 'default',
+  }) {
     const key = this._getKey(gameMode, difficulty);
     const entry = {
       name: name.substring(0, 20), // Limit name length

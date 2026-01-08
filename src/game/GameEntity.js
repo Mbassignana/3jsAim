@@ -581,9 +581,7 @@ export class EntityManager extends EventEmitter {
       }
     }
 
-    return results
-      .sort((a, b) => a.distance - b.distance)
-      .map((r) => r.entity);
+    return results.sort((a, b) => a.distance - b.distance).map((r) => r.entity);
   }
 
   /**

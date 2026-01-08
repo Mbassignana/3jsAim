@@ -190,8 +190,8 @@ describe('ParticleSystem', () => {
         const particle = emitter.particles[0];
         expect(
           particle.position.x !== initialPos.x ||
-          particle.position.y !== initialPos.y ||
-          particle.position.z !== initialPos.z,
+            particle.position.y !== initialPos.y ||
+            particle.position.z !== initialPos.z
         ).toBe(true);
       });
 
@@ -556,7 +556,9 @@ describe('ParticleSystem', () => {
     describe('createFromPreset()', () => {
       it('should create emitter from preset', () => {
         const emitter = particleSystem.createFromPreset('WALL_IMPACT', {
-          x: 5, y: 10, z: 0,
+          x: 5,
+          y: 10,
+          z: 0,
         });
 
         expect(emitter).not.toBeNull();
@@ -571,9 +573,13 @@ describe('ParticleSystem', () => {
       });
 
       it('should allow option overrides', () => {
-        const _emitter = particleSystem.createFromPreset('WALL_IMPACT', { x: 0, y: 0, z: 0 }, {
-          particleCount: 5,
-        });
+        const _emitter = particleSystem.createFromPreset(
+          'WALL_IMPACT',
+          { x: 0, y: 0, z: 0 },
+          {
+            particleCount: 5,
+          }
+        );
 
         expect(particleSystem.particleCount).toBe(5);
       });
@@ -600,11 +606,7 @@ describe('ParticleSystem', () => {
       });
 
       it('should create target hit with custom color', () => {
-        const emitter = particleSystem.createTargetHit(
-          { x: 5, y: 5, z: 0 },
-          null,
-          '#00ff00',
-        );
+        const emitter = particleSystem.createTargetHit({ x: 5, y: 5, z: 0 }, null, '#00ff00');
 
         expect(emitter).not.toBeNull();
       });
@@ -618,7 +620,7 @@ describe('ParticleSystem', () => {
       it('should create muzzle flash effect', () => {
         const emitter = particleSystem.createMuzzleFlash(
           { x: 0, y: 0, z: 0 },
-          { x: 1, y: 0, z: 0 },
+          { x: 1, y: 0, z: 0 }
         );
 
         expect(emitter).not.toBeNull();
@@ -627,7 +629,7 @@ describe('ParticleSystem', () => {
       it('should create shell casing effect', () => {
         const emitter = particleSystem.createShellCasing(
           { x: 0, y: 0, z: 0 },
-          { x: 1, y: 1, z: 0 },
+          { x: 1, y: 1, z: 0 }
         );
 
         expect(emitter).not.toBeNull();

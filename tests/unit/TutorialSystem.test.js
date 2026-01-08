@@ -18,9 +18,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] || null),
-    setItem: vi.fn((key, value) => { store[key] = value; }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, value) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 
@@ -118,9 +124,12 @@ describe('TutorialSystem', () => {
     });
 
     it('should load progress from localStorage', () => {
-      localStorageMock.setItem('tutorial_progress', JSON.stringify({
-        completed: ['basics'],
-      }));
+      localStorageMock.setItem(
+        'tutorial_progress',
+        JSON.stringify({
+          completed: ['basics'],
+        })
+      );
 
       const newTutorial = new TutorialSystem();
       expect(newTutorial.getCompletedTutorials()).toContain('basics');
@@ -177,9 +186,12 @@ describe('TutorialSystem', () => {
 
     it('should allow advanced after basics completed', () => {
       // Simulate basics completion
-      localStorageMock.setItem('tutorial_progress', JSON.stringify({
-        completed: ['basics'],
-      }));
+      localStorageMock.setItem(
+        'tutorial_progress',
+        JSON.stringify({
+          completed: ['basics'],
+        })
+      );
       const newTutorial = new TutorialSystem();
 
       const result = newTutorial.startTutorial('advanced');
@@ -431,9 +443,12 @@ describe('TutorialSystem', () => {
     });
 
     it('should return completed tutorials', () => {
-      localStorageMock.setItem('tutorial_progress', JSON.stringify({
-        completed: ['basics', 'advanced'],
-      }));
+      localStorageMock.setItem(
+        'tutorial_progress',
+        JSON.stringify({
+          completed: ['basics', 'advanced'],
+        })
+      );
 
       const newTutorial = new TutorialSystem();
       const completed = newTutorial.getCompletedTutorials();
@@ -456,9 +471,12 @@ describe('TutorialSystem', () => {
     });
 
     it('should return true for advanced after basics completed', () => {
-      localStorageMock.setItem('tutorial_progress', JSON.stringify({
-        completed: ['basics'],
-      }));
+      localStorageMock.setItem(
+        'tutorial_progress',
+        JSON.stringify({
+          completed: ['basics'],
+        })
+      );
 
       const newTutorial = new TutorialSystem();
       expect(newTutorial.isTutorialAvailable('advanced')).toBe(true);
@@ -559,9 +577,12 @@ describe('TutorialSystem', () => {
   // ==========================================================================
   describe('resetProgress()', () => {
     it('should clear all progress', () => {
-      localStorageMock.setItem('tutorial_progress', JSON.stringify({
-        completed: ['basics'],
-      }));
+      localStorageMock.setItem(
+        'tutorial_progress',
+        JSON.stringify({
+          completed: ['basics'],
+        })
+      );
 
       const newTutorial = new TutorialSystem();
       newTutorial.resetProgress();

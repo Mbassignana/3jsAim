@@ -254,9 +254,7 @@ describe('GameModeSystem', () => {
       vi.advanceTimersByTime(GameModes.TIME_ATTACK.rules.timeLimit * 1000 + 100);
 
       expect(system.isActive).toBe(false);
-      expect(handler).toHaveBeenCalledWith(
-        expect.objectContaining({ reason: 'time_up' })
-      );
+      expect(handler).toHaveBeenCalledWith(expect.objectContaining({ reason: 'time_up' }));
     });
 
     it('should emit timer tick events', () => {
@@ -361,9 +359,7 @@ describe('GameModeSystem', () => {
         system.registerHit();
       }
 
-      expect(handler).toHaveBeenCalledWith(
-        expect.objectContaining({ reason: 'target_reached' })
-      );
+      expect(handler).toHaveBeenCalledWith(expect.objectContaining({ reason: 'target_reached' }));
     });
 
     it('should have one life', () => {

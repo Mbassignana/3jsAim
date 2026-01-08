@@ -183,9 +183,11 @@ describe('KeyboardNavigation', () => {
 
       nav.createGroup('menu');
 
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        groupId: 'menu',
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          groupId: 'menu',
+        })
+      );
     });
   });
 
@@ -254,10 +256,12 @@ describe('KeyboardNavigation', () => {
       nav.createGroup('menu');
       nav.setActiveGroup('menu');
 
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        groupId: 'menu',
-        previousGroup: null,
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          groupId: 'menu',
+          previousGroup: null,
+        })
+      );
     });
   });
 
@@ -320,9 +324,11 @@ describe('KeyboardNavigation', () => {
       nav.createGroup('menu');
       nav.registerElement(btn, 'menu');
 
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        groupId: 'menu',
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          groupId: 'menu',
+        })
+      );
     });
   });
 
@@ -347,9 +353,11 @@ describe('KeyboardNavigation', () => {
       nav.registerElement(btn, 'menu');
       nav.unregisterElement(btn, 'menu');
 
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        groupId: 'menu',
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          groupId: 'menu',
+        })
+      );
     });
   });
 
@@ -781,11 +789,13 @@ describe('KeyboardNavigation', () => {
 
       nav.navigateNext();
 
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        groupId: 'menu',
-        fromIndex: 0,
-        toIndex: 1,
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          groupId: 'menu',
+          fromIndex: 0,
+          toIndex: 1,
+        })
+      );
     });
   });
 

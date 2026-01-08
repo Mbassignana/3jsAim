@@ -353,8 +353,7 @@ export class CircleManager extends EventEmitter {
     const time = currentTime * 0.001;
 
     // Floating animation
-    const floatY =
-      Math.sin(time * data.floatSpeed + data.floatOffset) * data.floatAmplitude;
+    const floatY = Math.sin(time * data.floatSpeed + data.floatOffset) * data.floatAmplitude;
     mesh.position.y += floatY * deltaTime;
 
     // Rotation animation

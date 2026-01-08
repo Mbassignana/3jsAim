@@ -2,12 +2,7 @@
  * Tests for WeaponSystem - Weapon variety with different characteristics
  */
 
-import {
-  WeaponSystem,
-  Weapons,
-  getWeaponSystem,
-  resetWeaponSystem,
-} from '@game/WeaponSystem.js';
+import { WeaponSystem, Weapons, getWeaponSystem, resetWeaponSystem } from '@game/WeaponSystem.js';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 describe('WeaponSystem', () => {
@@ -38,7 +33,18 @@ describe('WeaponSystem', () => {
     });
 
     it('should have required properties on each weapon', () => {
-      const requiredProps = ['id', 'name', 'description', 'icon', 'fireRate', 'damage', 'pelletCount', 'spread', 'range', 'coneAngle'];
+      const requiredProps = [
+        'id',
+        'name',
+        'description',
+        'icon',
+        'fireRate',
+        'damage',
+        'pelletCount',
+        'spread',
+        'range',
+        'coneAngle',
+      ];
 
       Object.values(Weapons).forEach((weapon) => {
         requiredProps.forEach((prop) => {
@@ -285,7 +291,9 @@ describe('WeaponSystem', () => {
       }
       noAmmoSystem._state.reserveAmmo = 0;
 
-      const result = noAmmoSystem.shoot({ currentTime: (Weapons.PISTOL.ammo.clipSize + 2) * fireRate });
+      const result = noAmmoSystem.shoot({
+        currentTime: (Weapons.PISTOL.ammo.clipSize + 2) * fireRate,
+      });
       expect(result.canShoot).toBe(false);
       expect(result.blockReason).toBe('no_ammo');
     });

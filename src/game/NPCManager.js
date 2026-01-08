@@ -237,7 +237,14 @@ export class NPCManager extends EventEmitter {
     this._scene.add(mesh);
 
     // Add physics body
-    this._physicsWorld.addNPC(x, npcType.size.height / 2, z, npcType.size.width, npcType.size.height, npcType.size.depth);
+    this._physicsWorld.addNPC(
+      x,
+      npcType.size.height / 2,
+      z,
+      npcType.size.width,
+      npcType.size.height,
+      npcType.size.depth
+    );
 
     // Emit events
     this.emit(GameEvents.NPC_SPAWN, { id, npcType: npcType.name, position: { x, z } });
@@ -274,7 +281,8 @@ export class NPCManager extends EventEmitter {
         this._chooseNewTarget(data);
         data.isMoving = true;
         data.moveTimer =
-          this.config.minMoveTime + Math.random() * (this.config.maxMoveTime - this.config.minMoveTime);
+          this.config.minMoveTime +
+          Math.random() * (this.config.maxMoveTime - this.config.minMoveTime);
       }
     } else {
       // Moving state
@@ -301,13 +309,15 @@ export class NPCManager extends EventEmitter {
 
       // Check if reached target or timer expired
       const distanceToTarget = Math.sqrt(
-        Math.pow(data.position.x - data.targetPosition.x, 2) + Math.pow(data.position.z - data.targetPosition.z, 2)
+        Math.pow(data.position.x - data.targetPosition.x, 2) +
+          Math.pow(data.position.z - data.targetPosition.z, 2)
       );
 
       if (distanceToTarget < this.config.arrivalThreshold || data.moveTimer <= 0) {
         data.isMoving = false;
         data.idleTimer =
-          this.config.minIdleTime + Math.random() * (this.config.maxIdleTime - this.config.minIdleTime);
+          this.config.minIdleTime +
+          Math.random() * (this.config.maxIdleTime - this.config.minIdleTime);
       }
     }
   }

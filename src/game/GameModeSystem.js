@@ -250,8 +250,8 @@ export class GameModeSystem extends EventEmitter {
    */
   setMode(mode) {
     if (typeof mode === 'string') {
-      const foundMode = GameModes[mode.toUpperCase()] ||
-        Object.values(GameModes).find((m) => m.id === mode);
+      const foundMode =
+        GameModes[mode.toUpperCase()] || Object.values(GameModes).find((m) => m.id === mode);
       if (!foundMode) {
         throw new Error(`Unknown game mode: ${mode}`);
       }
@@ -303,7 +303,8 @@ export class GameModeSystem extends EventEmitter {
 
     // Apply accuracy bonus if configured
     if (this._currentMode.scoring.accuracyBonus > 0) {
-      const accuracyMultiplier = 1 + (this.accuracy / 100) * this._currentMode.scoring.accuracyBonus;
+      const accuracyMultiplier =
+        1 + (this.accuracy / 100) * this._currentMode.scoring.accuracyBonus;
       points = Math.round(points * accuracyMultiplier);
     }
 
@@ -317,8 +318,10 @@ export class GameModeSystem extends EventEmitter {
     this.emit('hit', { points, score: this._state.score, hits: this._state.hits });
 
     // Check win condition (target score)
-    if (this._currentMode.rules.targetScore > 0 &&
-        this._state.score >= this._currentMode.rules.targetScore) {
+    if (
+      this._currentMode.rules.targetScore > 0 &&
+      this._state.score >= this._currentMode.rules.targetScore
+    ) {
       this._endGame('target_reached');
     }
 
@@ -359,9 +362,12 @@ export class GameModeSystem extends EventEmitter {
     }
 
     // Check accuracy threshold
-    if (this._currentMode.rules.accuracyThreshold > 0 &&
-        this.accuracy < this._currentMode.rules.accuracyThreshold &&
-        this._state.hits + this._state.misses >= 10) { // Need minimum shots
+    if (
+      this._currentMode.rules.accuracyThreshold > 0 &&
+      this.accuracy < this._currentMode.rules.accuracyThreshold &&
+      this._state.hits + this._state.misses >= 10
+    ) {
+      // Need minimum shots
       this._endGame('accuracy_too_low');
       return { points, newScore: this._state.score, gameOver: true };
     }
@@ -431,7 +437,9 @@ export class GameModeSystem extends EventEmitter {
 
     // Accuracy bonus
     if (this._currentMode.scoring.accuracyBonus > 0) {
-      accuracyBonus = Math.round(baseScore * (this.accuracy / 100) * this._currentMode.scoring.accuracyBonus);
+      accuracyBonus = Math.round(
+        baseScore * (this.accuracy / 100) * this._currentMode.scoring.accuracyBonus
+      );
     }
 
     const finalScore = baseScore + timeBonus + accuracyBonus;
@@ -475,9 +483,7 @@ export class GameModeSystem extends EventEmitter {
    * @returns {GameModeConfig|null}
    */
   static getModeById(id) {
-    return GameModes[id.toUpperCase()] ||
-      Object.values(GameModes).find((m) => m.id === id) ||
-      null;
+    return GameModes[id.toUpperCase()] || Object.values(GameModes).find((m) => m.id === id) || null;
   }
 
   /**

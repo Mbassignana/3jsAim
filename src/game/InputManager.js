@@ -167,9 +167,7 @@ export class InputManager extends EventEmitter {
     const action = this._keyBindings[code];
     if (action) {
       // Only remove action if no other key is bound to it
-      const stillDown = Array.from(this._keysDown).some(
-        (key) => this._keyBindings[key] === action
-      );
+      const stillDown = Array.from(this._keysDown).some((key) => this._keyBindings[key] === action);
       if (!stillDown) {
         this._actionsDown.delete(action);
         this.emit('actionUp', { action, key: code });

@@ -135,9 +135,7 @@ describe('ComboSystem', () => {
       const callback = vi.fn();
       combo.on(GameEvents.COMBO_INCREASE, callback);
       combo.registerHit();
-      expect(callback).toHaveBeenCalledWith(
-        expect.objectContaining({ combo: 1, multiplier: 1.0 })
-      );
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ combo: 1, multiplier: 1.0 }));
     });
 
     it('should emit tierUp event', () => {
@@ -146,9 +144,7 @@ describe('ComboSystem', () => {
       for (let i = 0; i < 5; i++) {
         combo.registerHit();
       }
-      expect(callback).toHaveBeenCalledWith(
-        expect.objectContaining({ tier: 1, multiplier: 1.5 })
-      );
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ tier: 1, multiplier: 1.5 }));
     });
 
     it('should cap at maxCombo', () => {
@@ -224,9 +220,7 @@ describe('ComboSystem', () => {
 
       vi.advanceTimersByTime(DEFAULT_COMBO_CONFIG.comboTimeout + 100);
 
-      expect(callback).toHaveBeenCalledWith(
-        expect.objectContaining({ reason: 'timeout' })
-      );
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ reason: 'timeout' }));
     });
 
     it('should extend timeout on hit', () => {

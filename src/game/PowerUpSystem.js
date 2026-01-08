@@ -187,7 +187,10 @@ export class PowerUpSystem extends EventEmitter {
    */
   setEnabledTypes(typeIds) {
     this._enabledTypes = typeIds
-      .map((id) => PowerUpTypes[id.toUpperCase()] || Object.values(PowerUpTypes).find((t) => t.id === id))
+      .map(
+        (id) =>
+          PowerUpTypes[id.toUpperCase()] || Object.values(PowerUpTypes).find((t) => t.id === id)
+      )
       .filter(Boolean);
   }
 
@@ -381,7 +384,10 @@ export class PowerUpSystem extends EventEmitter {
         modifiers.coneMultiplier = Math.max(modifiers.coneMultiplier, type.effect.coneMultiplier);
       }
       if (type.effect.fireRateMultiplier !== undefined) {
-        modifiers.fireRateMultiplier = Math.max(modifiers.fireRateMultiplier, type.effect.fireRateMultiplier);
+        modifiers.fireRateMultiplier = Math.max(
+          modifiers.fireRateMultiplier,
+          type.effect.fireRateMultiplier
+        );
       }
       if (type.effect.blockPenalty) {
         modifiers.blockPenalty = true;

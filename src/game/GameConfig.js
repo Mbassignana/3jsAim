@@ -137,7 +137,10 @@ export function validateConfig(config) {
   const errors = [];
 
   // Validate timing
-  if (typeof config.timing?.defaultGameDuration !== 'number' || config.timing.defaultGameDuration <= 0) {
+  if (
+    typeof config.timing?.defaultGameDuration !== 'number' ||
+    config.timing.defaultGameDuration <= 0
+  ) {
     errors.push('timing.defaultGameDuration must be a positive number');
   }
 

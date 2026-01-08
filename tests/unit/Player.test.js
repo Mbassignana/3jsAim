@@ -66,21 +66,21 @@ describe('Player', () => {
   // ==========================================================================
   describe('constructor', () => {
     it('should throw if camera is missing', () => {
-      expect(
-        () => new Player({ scene: mockScene, physicsWorld: mockPhysicsWorld })
-      ).toThrow('requires a camera');
+      expect(() => new Player({ scene: mockScene, physicsWorld: mockPhysicsWorld })).toThrow(
+        'requires a camera'
+      );
     });
 
     it('should throw if scene is missing', () => {
-      expect(
-        () => new Player({ camera: mockCamera, physicsWorld: mockPhysicsWorld })
-      ).toThrow('requires a scene');
+      expect(() => new Player({ camera: mockCamera, physicsWorld: mockPhysicsWorld })).toThrow(
+        'requires a scene'
+      );
     });
 
     it('should throw if physicsWorld is missing', () => {
-      expect(
-        () => new Player({ camera: mockCamera, scene: mockScene })
-      ).toThrow('requires a physicsWorld');
+      expect(() => new Player({ camera: mockCamera, scene: mockScene })).toThrow(
+        'requires a physicsWorld'
+      );
     });
 
     it('should initialize with default config', () => {

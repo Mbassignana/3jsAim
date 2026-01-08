@@ -60,7 +60,16 @@ function createMockThree() {
     constructor(geometry, material) {
       this.geometry = geometry;
       this.material = material;
-      this.position = { x: 0, y: 0, z: 0, set: function (x, y, z) { this.x = x; this.y = y; this.z = z; } };
+      this.position = {
+        x: 0,
+        y: 0,
+        z: 0,
+        set: function (x, y, z) {
+          this.x = x;
+          this.y = y;
+          this.z = z;
+        },
+      };
       this.rotation = { x: 0, y: 0, z: 0 };
       this.castShadow = false;
       this.receiveShadow = false;
@@ -84,7 +93,16 @@ function createMockThree() {
     constructor(color, intensity) {
       this.color = color;
       this.intensity = intensity;
-      this.position = { x: 0, y: 0, z: 0, set: function (x, y, z) { this.x = x; this.y = y; this.z = z; } };
+      this.position = {
+        x: 0,
+        y: 0,
+        z: 0,
+        set: function (x, y, z) {
+          this.x = x;
+          this.y = y;
+          this.z = z;
+        },
+      };
       this.castShadow = false;
       this.shadow = {
         mapSize: { width: 0, height: 0 },
@@ -98,7 +116,16 @@ function createMockThree() {
       this.color = color;
       this.intensity = intensity;
       this.distance = distance;
-      this.position = { x: 0, y: 0, z: 0, set: function (x, y, z) { this.x = x; this.y = y; this.z = z; } };
+      this.position = {
+        x: 0,
+        y: 0,
+        z: 0,
+        set: function (x, y, z) {
+          this.x = x;
+          this.y = y;
+          this.z = z;
+        },
+      };
     }
   }
 
@@ -254,9 +281,10 @@ describe('SceneManager', () => {
       sceneManager.init();
       // Should have added lights to scene
       const lights = mockScene.children.filter(
-        (c) => c instanceof mockThree.AmbientLight ||
-               c instanceof mockThree.DirectionalLight ||
-               c instanceof mockThree.PointLight
+        (c) =>
+          c instanceof mockThree.AmbientLight ||
+          c instanceof mockThree.DirectionalLight ||
+          c instanceof mockThree.PointLight
       );
       expect(lights.length).toBeGreaterThan(0);
     });
@@ -302,9 +330,7 @@ describe('SceneManager', () => {
   describe('setupLighting', () => {
     it('should add ambient light', () => {
       sceneManager.setupLighting();
-      const ambientLights = mockScene.children.filter(
-        (c) => c instanceof mockThree.AmbientLight
-      );
+      const ambientLights = mockScene.children.filter((c) => c instanceof mockThree.AmbientLight);
       expect(ambientLights.length).toBe(1);
     });
 
@@ -318,17 +344,13 @@ describe('SceneManager', () => {
 
     it('should configure shadow on directional light', () => {
       sceneManager.setupLighting();
-      const dirLight = mockScene.children.find(
-        (c) => c instanceof mockThree.DirectionalLight
-      );
+      const dirLight = mockScene.children.find((c) => c instanceof mockThree.DirectionalLight);
       expect(dirLight.castShadow).toBe(true);
     });
 
     it('should add point lights', () => {
       sceneManager.setupLighting();
-      const pointLights = mockScene.children.filter(
-        (c) => c instanceof mockThree.PointLight
-      );
+      const pointLights = mockScene.children.filter((c) => c instanceof mockThree.PointLight);
       expect(pointLights.length).toBe(2);
     });
 
@@ -437,9 +459,7 @@ describe('SceneManager', () => {
 
     it('should add physics bodies for each building', () => {
       sceneManager.createMainBuildings();
-      expect(mockPhysicsWorld.addBuilding).toHaveBeenCalledTimes(
-        DEFAULT_BUILDING_CONFIGS.length
-      );
+      expect(mockPhysicsWorld.addBuilding).toHaveBeenCalledTimes(DEFAULT_BUILDING_CONFIGS.length);
     });
   });
 
@@ -490,7 +510,9 @@ describe('SceneManager', () => {
       const callback = vi.fn();
       sceneManager.on('scene:buildingCreated', callback);
       sceneManager.createBuilding(0, 0, 10, 10, 10, 0xff0000);
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ building: expect.anything() }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({ building: expect.anything() })
+      );
     });
 
     it('should add window details', () => {
@@ -510,9 +532,7 @@ describe('SceneManager', () => {
     });
 
     it('should accept custom wall configs', () => {
-      const customConfigs = [
-        { pos: [0, 0, 0], size: [10, 5, 1], rotation: 0 },
-      ];
+      const customConfigs = [{ pos: [0, 0, 0], size: [10, 5, 1], rotation: 0 }];
       sceneManager.createWalls(customConfigs);
       expect(sceneManager.walls.length).toBe(1);
     });
@@ -564,7 +584,10 @@ describe('SceneManager', () => {
     });
 
     it('should accept custom positions', () => {
-      sceneManager.createBarrels([[0, 0, 0], [10, 0, 10]]);
+      sceneManager.createBarrels([
+        [0, 0, 0],
+        [10, 0, 10],
+      ]);
       expect(sceneManager.props.length).toBe(2);
     });
 
@@ -710,7 +733,9 @@ describe('SceneManager', () => {
       expect(state.initialized).toBe(true);
       expect(state.buildingCount).toBe(DEFAULT_BUILDING_CONFIGS.length);
       expect(state.wallCount).toBe(DEFAULT_WALL_CONFIGS.length);
-      expect(state.propCount).toBe(DEFAULT_BARREL_POSITIONS.length + DEFAULT_CRATE_POSITIONS.length);
+      expect(state.propCount).toBe(
+        DEFAULT_BARREL_POSITIONS.length + DEFAULT_CRATE_POSITIONS.length
+      );
       expect(state.hasGround).toBe(true);
       expect(state.hasSky).toBe(true);
     });

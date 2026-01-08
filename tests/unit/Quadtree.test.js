@@ -273,12 +273,13 @@ describe('Quadtree', () => {
     });
 
     it('should reset subdivision', () => {
-      const customTree = new Quadtree(
-        { x: 0, y: 0, width: 100, height: 100 },
-        { maxItems: 2 }
-      );
+      const customTree = new Quadtree({ x: 0, y: 0, width: 100, height: 100 }, { maxItems: 2 });
 
-      customTree.insertAll([{ x: 10, y: 10 }, { x: 20, y: 20 }, { x: 30, y: 30 }]);
+      customTree.insertAll([
+        { x: 10, y: 10 },
+        { x: 20, y: 20 },
+        { x: 30, y: 30 },
+      ]);
       expect(customTree.root.divided).toBe(true);
 
       customTree.clear();
@@ -288,9 +289,16 @@ describe('Quadtree', () => {
 
   describe('rebuild', () => {
     it('should rebuild tree with new items', () => {
-      tree.insertAll([{ x: 10, y: 10 }, { x: 20, y: 20 }]);
+      tree.insertAll([
+        { x: 10, y: 10 },
+        { x: 20, y: 20 },
+      ]);
 
-      tree.rebuild([{ x: 30, y: 30 }, { x: 40, y: 40 }, { x: -10, y: -10 }]);
+      tree.rebuild([
+        { x: 30, y: 30 },
+        { x: 40, y: 40 },
+        { x: -10, y: -10 },
+      ]);
 
       expect(tree.getItemCount()).toBe(3);
     });
@@ -303,12 +311,13 @@ describe('Quadtree', () => {
     });
 
     it('should return more nodes after subdivision', () => {
-      const customTree = new Quadtree(
-        { x: 0, y: 0, width: 100, height: 100 },
-        { maxItems: 2 }
-      );
+      const customTree = new Quadtree({ x: 0, y: 0, width: 100, height: 100 }, { maxItems: 2 });
 
-      customTree.insertAll([{ x: 10, y: 10 }, { x: 20, y: 20 }, { x: 30, y: 30 }]);
+      customTree.insertAll([
+        { x: 10, y: 10 },
+        { x: 20, y: 20 },
+        { x: 30, y: 30 },
+      ]);
 
       const nodes = customTree.getAllNodes();
       expect(nodes.length).toBeGreaterThan(1);
@@ -487,9 +496,7 @@ describe('Performance characteristics', () => {
     // Brute force for comparison
     const bfStart = performance.now();
     const _bfResults = items.filter((item) => {
-      return (
-        item.x >= -250 && item.x <= 250 && item.y >= -250 && item.y <= 250
-      );
+      return item.x >= -250 && item.x <= 250 && item.y >= -250 && item.y <= 250;
     });
     const _bfTime = performance.now() - bfStart;
 

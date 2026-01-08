@@ -205,10 +205,12 @@ describe('ResponsiveManager', () => {
       responsive.init({ width: 1024, height: 768 });
       responsive.setDimensions(400, 600);
 
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        deviceChanged: true,
-        deviceType: DeviceTypes.MOBILE,
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          deviceChanged: true,
+          deviceType: DeviceTypes.MOBILE,
+        })
+      );
     });
   });
 
@@ -434,10 +436,12 @@ describe('ResponsiveManager', () => {
         responsive.init({ width: 1024, height: 768 });
         responsive.addCustomBreakpoint('custom', 1800, { uiScale: 1.5 });
 
-        expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-          name: 'custom',
-          minWidth: 1800,
-        }));
+        expect(callback).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: 'custom',
+            minWidth: 1800,
+          })
+        );
       });
     });
 
@@ -669,10 +673,12 @@ describe('ResponsiveManager', () => {
       responsive.init({ width: 1024, height: 768 });
       responsive.setDimensions(768, 1024);
 
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        orientationChanged: true,
-        orientation: Orientations.PORTRAIT,
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orientationChanged: true,
+          orientation: Orientations.PORTRAIT,
+        })
+      );
     });
   });
 });

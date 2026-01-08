@@ -306,7 +306,9 @@ export class Player extends EventEmitter {
     this.direction.x = Number(this.movement.right) - Number(this.movement.left);
 
     // Normalize direction
-    const dirLength = Math.sqrt(this.direction.x * this.direction.x + this.direction.z * this.direction.z);
+    const dirLength = Math.sqrt(
+      this.direction.x * this.direction.x + this.direction.z * this.direction.z
+    );
     if (dirLength > 0) {
       this.direction.x /= dirLength;
       this.direction.z /= dirLength;
@@ -455,7 +457,9 @@ export class Player extends EventEmitter {
    * @returns {boolean}
    */
   isMoving() {
-    return this.movement.forward || this.movement.backward || this.movement.left || this.movement.right;
+    return (
+      this.movement.forward || this.movement.backward || this.movement.left || this.movement.right
+    );
   }
 
   /**

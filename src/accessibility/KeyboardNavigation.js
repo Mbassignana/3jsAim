@@ -254,7 +254,11 @@ export class KeyboardNavigation extends EventEmitter {
     }
 
     const group = this._groups.get(groupId);
-    const { id = `nav-${groupId}-${group.elements.length}`, order = group.elements.length, label } = options;
+    const {
+      id = `nav-${groupId}-${group.elements.length}`,
+      order = group.elements.length,
+      label,
+    } = options;
 
     const focusableElement = {
       element,
@@ -538,73 +542,73 @@ export class KeyboardNavigation extends EventEmitter {
     const orientation = group?.orientation || 'vertical';
 
     switch (e.key) {
-    case NavigationKeys.UP:
-      if (orientation === 'vertical' || orientation === 'both') {
-        e.preventDefault();
-        this.navigatePrevious();
-      }
-      break;
-
-    case NavigationKeys.DOWN:
-      if (orientation === 'vertical' || orientation === 'both') {
-        e.preventDefault();
-        this.navigateNext();
-      }
-      break;
-
-    case NavigationKeys.LEFT:
-      if (orientation === 'horizontal' || orientation === 'both') {
-        e.preventDefault();
-        this.navigatePrevious();
-      }
-      break;
-
-    case NavigationKeys.RIGHT:
-      if (orientation === 'horizontal' || orientation === 'both') {
-        e.preventDefault();
-        this.navigateNext();
-      }
-      break;
-
-    case NavigationKeys.HOME:
-      e.preventDefault();
-      this.navigateFirst();
-      break;
-
-    case NavigationKeys.END:
-      e.preventDefault();
-      this.navigateLast();
-      break;
-
-    case NavigationKeys.ENTER:
-    case NavigationKeys.SPACE:
-      if (this._activeGroup) {
-        // Let the browser handle button clicks naturally, but activate for other elements
-        const current = this.getCurrentFocusedElement();
-        if (current && current.element.tagName !== 'BUTTON') {
+      case NavigationKeys.UP:
+        if (orientation === 'vertical' || orientation === 'both') {
           e.preventDefault();
-          this.activateCurrent();
-        }
-      }
-      break;
-
-    case NavigationKeys.TAB:
-      if (this._trapFocus) {
-        e.preventDefault();
-        if (e.shiftKey) {
           this.navigatePrevious();
-        } else {
+        }
+        break;
+
+      case NavigationKeys.DOWN:
+        if (orientation === 'vertical' || orientation === 'both') {
+          e.preventDefault();
           this.navigateNext();
         }
-      }
-      break;
+        break;
 
-    case NavigationKeys.ESCAPE:
-      if (this._trapFocus) {
-        this.disableFocusTrap();
-        this.emit('navigation:escape');
-      }
-      break;
+      case NavigationKeys.LEFT:
+        if (orientation === 'horizontal' || orientation === 'both') {
+          e.preventDefault();
+          this.navigatePrevious();
+        }
+        break;
+
+      case NavigationKeys.RIGHT:
+        if (orientation === 'horizontal' || orientation === 'both') {
+          e.preventDefault();
+          this.navigateNext();
+        }
+        break;
+
+      case NavigationKeys.HOME:
+        e.preventDefault();
+        this.navigateFirst();
+        break;
+
+      case NavigationKeys.END:
+        e.preventDefault();
+        this.navigateLast();
+        break;
+
+      case NavigationKeys.ENTER:
+      case NavigationKeys.SPACE:
+        if (this._activeGroup) {
+          // Let the browser handle button clicks naturally, but activate for other elements
+          const current = this.getCurrentFocusedElement();
+          if (current && current.element.tagName !== 'BUTTON') {
+            e.preventDefault();
+            this.activateCurrent();
+          }
+        }
+        break;
+
+      case NavigationKeys.TAB:
+        if (this._trapFocus) {
+          e.preventDefault();
+          if (e.shiftKey) {
+            this.navigatePrevious();
+          } else {
+            this.navigateNext();
+          }
+        }
+        break;
+
+      case NavigationKeys.ESCAPE:
+        if (this._trapFocus) {
+          this.disableFocusTrap();
+          this.emit('navigation:escape');
+        }
+        break;
     }
   }
 

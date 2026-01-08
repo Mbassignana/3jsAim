@@ -4,12 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import {
-  EventEmitter,
-  GameEvents,
-  getEventBus,
-  resetEventBus,
-} from '@/utils/EventEmitter.js';
+import { EventEmitter, GameEvents, getEventBus, resetEventBus } from '@/utils/EventEmitter.js';
 
 describe('EventEmitter', () => {
   let emitter;

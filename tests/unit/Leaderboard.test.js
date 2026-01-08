@@ -4,11 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import {
-  Leaderboard,
-  getLeaderboard,
-  resetLeaderboard,
-} from '@/game/Leaderboard.js';
+import { Leaderboard, getLeaderboard, resetLeaderboard } from '@/game/Leaderboard.js';
 
 // Mock localStorage
 function createMockStorage() {
@@ -44,9 +40,7 @@ describe('Leaderboard', () => {
 
     it('should load existing data', () => {
       const existingData = {
-        default_medium: [
-          { name: 'Test', score: 100, timestamp: Date.now() },
-        ],
+        default_medium: [{ name: 'Test', score: 100, timestamp: Date.now() }],
       };
       mockStorage.getItem.mockReturnValueOnce(JSON.stringify(existingData));
       const loadedBoard = new Leaderboard({ storage: mockStorage });
@@ -283,9 +277,7 @@ describe('Leaderboard', () => {
 
     it('should import JSON', () => {
       const data = {
-        default_medium: [
-          { name: 'Imported', score: 999, timestamp: Date.now() },
-        ],
+        default_medium: [{ name: 'Imported', score: 999, timestamp: Date.now() }],
       };
       const result = board.import(JSON.stringify(data));
       expect(result).toBe(true);

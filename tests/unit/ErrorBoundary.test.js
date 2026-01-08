@@ -244,7 +244,9 @@ describe('ErrorBoundary', () => {
       const recoverableResult = errorBoundary.handleError(new GameError('Recoverable'));
       expect(recoverableResult).toBe(true);
 
-      const nonRecoverableResult = errorBoundary.handleError(new ValidationError('Not recoverable'));
+      const nonRecoverableResult = errorBoundary.handleError(
+        new ValidationError('Not recoverable')
+      );
       expect(nonRecoverableResult).toBe(false);
     });
 
@@ -491,22 +493,16 @@ describe('ErrorBoundary', () => {
     });
 
     it('should return fallback on error', () => {
-      const result = errorBoundary.tryOrDefault(
-        () => {
-          throw new Error('Failed');
-        },
-        'fallback'
-      );
+      const result = errorBoundary.tryOrDefault(() => {
+        throw new Error('Failed');
+      }, 'fallback');
       expect(result).toBe('fallback');
     });
 
     it('should store error when using fallback', () => {
-      errorBoundary.tryOrDefault(
-        () => {
-          throw new Error('Test');
-        },
-        null
-      );
+      errorBoundary.tryOrDefault(() => {
+        throw new Error('Test');
+      }, null);
       expect(errorBoundary.getErrorCount()).toBe(1);
     });
 

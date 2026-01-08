@@ -93,7 +93,7 @@ export const Tutorials = {
         id: 'first_shot',
         title: 'Fire Your Weapon',
         instruction: 'Click the left mouse button to shoot.',
-        hint: 'The crosshair in the center shows where you\'re aiming.',
+        hint: "The crosshair in the center shows where you're aiming.",
         action: TutorialActions.SHOOT,
         pauseGame: false,
       },
@@ -118,7 +118,7 @@ export const Tutorials = {
         id: 'reload',
         title: 'Reloading',
         instruction: 'Press R to reload your weapon.',
-        hint: 'Reload when you have a moment - don\'t wait until empty!',
+        hint: "Reload when you have a moment - don't wait until empty!",
         action: TutorialActions.RELOAD,
         pauseGame: false,
       },
@@ -133,7 +133,7 @@ export const Tutorials = {
       {
         id: 'complete',
         title: 'Tutorial Complete!',
-        instruction: 'You\'ve learned the basics. Ready to start training?',
+        instruction: "You've learned the basics. Ready to start training?",
         hint: 'Try Practice Mode to train at your own pace.',
         action: TutorialActions.CLICK,
         pauseGame: true,
@@ -151,7 +151,7 @@ export const Tutorials = {
       {
         id: 'intro',
         title: 'Advanced Training',
-        instruction: 'Let\'s learn some advanced techniques.',
+        instruction: "Let's learn some advanced techniques.",
         hint: 'Click to continue.',
         action: TutorialActions.CLICK,
         pauseGame: true,
@@ -212,7 +212,7 @@ export const Tutorials = {
       {
         id: 'complete',
         title: 'Advanced Training Complete!',
-        instruction: 'You\'re ready for competitive play.',
+        instruction: "You're ready for competitive play.",
         hint: 'Try different game modes to test your skills.',
         action: TutorialActions.CLICK,
         pauseGame: true,
@@ -352,7 +352,8 @@ export class TutorialSystem extends EventEmitter {
    * @returns {boolean}
    */
   startTutorial(tutorialId) {
-    const tutorial = Tutorials[tutorialId.toUpperCase()] ||
+    const tutorial =
+      Tutorials[tutorialId.toUpperCase()] ||
       Object.values(Tutorials).find((t) => t.id === tutorialId);
 
     if (!tutorial) {
@@ -485,29 +486,29 @@ export class TutorialSystem extends EventEmitter {
 
     // Update tracking (always happens in both modes)
     switch (action) {
-    case TutorialActions.LOOK:
-      this._actionTracking.mouseMovement += data.distance || 0;
-      break;
+      case TutorialActions.LOOK:
+        this._actionTracking.mouseMovement += data.distance || 0;
+        break;
 
-    case TutorialActions.MOVE:
-      this._actionTracking.playerMovement += data.distance || 0;
-      break;
+      case TutorialActions.MOVE:
+        this._actionTracking.playerMovement += data.distance || 0;
+        break;
 
-    case TutorialActions.SHOOT:
-      this._actionTracking.shotsFired++;
-      break;
+      case TutorialActions.SHOOT:
+        this._actionTracking.shotsFired++;
+        break;
 
-    case TutorialActions.HIT_TARGET: {
-      this._actionTracking.targetsHit++;
-      const now = Date.now();
-      if (now - this._actionTracking.lastHitTime < 2000) {
-        this._actionTracking.consecutiveHits++;
-      } else {
-        this._actionTracking.consecutiveHits = 1;
+      case TutorialActions.HIT_TARGET: {
+        this._actionTracking.targetsHit++;
+        const now = Date.now();
+        if (now - this._actionTracking.lastHitTime < 2000) {
+          this._actionTracking.consecutiveHits++;
+        } else {
+          this._actionTracking.consecutiveHits = 1;
+        }
+        this._actionTracking.lastHitTime = now;
+        break;
       }
-      this._actionTracking.lastHitTime = now;
-      break;
-    }
     }
 
     // Check if step action is completed (only in tutorial mode)
@@ -554,9 +555,10 @@ export class TutorialSystem extends EventEmitter {
     return {
       shotsFired: this._actionTracking.shotsFired,
       targetsHit: this._actionTracking.targetsHit,
-      accuracy: this._actionTracking.shotsFired > 0
-        ? (this._actionTracking.targetsHit / this._actionTracking.shotsFired) * 100
-        : 0,
+      accuracy:
+        this._actionTracking.shotsFired > 0
+          ? (this._actionTracking.targetsHit / this._actionTracking.shotsFired) * 100
+          : 0,
       bestStreak: this._actionTracking.consecutiveHits,
     };
   }
@@ -597,59 +599,59 @@ export class TutorialSystem extends EventEmitter {
     const params = step.actionParams || {};
 
     switch (step.action) {
-    case TutorialActions.NONE:
-    case TutorialActions.CLICK:
-      return action === TutorialActions.CLICK;
+      case TutorialActions.NONE:
+      case TutorialActions.CLICK:
+        return action === TutorialActions.CLICK;
 
-    case TutorialActions.LOOK:
-      return this._actionTracking.mouseMovement >= (params.minDistance || 50);
+      case TutorialActions.LOOK:
+        return this._actionTracking.mouseMovement >= (params.minDistance || 50);
 
-    case TutorialActions.MOVE:
-      return this._actionTracking.playerMovement >= (params.minDistance || 3);
+      case TutorialActions.MOVE:
+        return this._actionTracking.playerMovement >= (params.minDistance || 3);
 
-    case TutorialActions.SHOOT:
-      return this._actionTracking.shotsFired >= 1;
+      case TutorialActions.SHOOT:
+        return this._actionTracking.shotsFired >= 1;
 
-    case TutorialActions.HIT_TARGET:
-      // Check for specific target/weapon type if required
-      if (params.targetType && data.targetType !== params.targetType) {
-        return false;
-      }
-      if (params.weaponType && data.weaponType !== params.weaponType) {
-        return false;
-      }
-      return this._actionTracking.targetsHit >= 1;
-
-    case TutorialActions.RELOAD:
-      return action === TutorialActions.RELOAD;
-
-    case TutorialActions.SWITCH_WEAPON:
-      return action === TutorialActions.SWITCH_WEAPON;
-
-    case TutorialActions.PAUSE:
-      return action === TutorialActions.PAUSE;
-
-    case TutorialActions.HIT_STREAK: {
-      const required = params.count || 3;
-      if (params.maxTime) {
-        // Check if streak was achieved within time limit
-        const timeSinceStart = Date.now() - this._stepStartTime;
-        if (timeSinceStart > params.maxTime) {
-          this._actionTracking.consecutiveHits = 0;
+      case TutorialActions.HIT_TARGET:
+        // Check for specific target/weapon type if required
+        if (params.targetType && data.targetType !== params.targetType) {
           return false;
         }
+        if (params.weaponType && data.weaponType !== params.weaponType) {
+          return false;
+        }
+        return this._actionTracking.targetsHit >= 1;
+
+      case TutorialActions.RELOAD:
+        return action === TutorialActions.RELOAD;
+
+      case TutorialActions.SWITCH_WEAPON:
+        return action === TutorialActions.SWITCH_WEAPON;
+
+      case TutorialActions.PAUSE:
+        return action === TutorialActions.PAUSE;
+
+      case TutorialActions.HIT_STREAK: {
+        const required = params.count || 3;
+        if (params.maxTime) {
+          // Check if streak was achieved within time limit
+          const timeSinceStart = Date.now() - this._stepStartTime;
+          if (timeSinceStart > params.maxTime) {
+            this._actionTracking.consecutiveHits = 0;
+            return false;
+          }
+        }
+        return this._actionTracking.consecutiveHits >= required;
       }
-      return this._actionTracking.consecutiveHits >= required;
-    }
 
-    case TutorialActions.SCORE_POINTS:
-      return (data.score || 0) >= (params.threshold || 100);
+      case TutorialActions.SCORE_POINTS:
+        return (data.score || 0) >= (params.threshold || 100);
 
-    case TutorialActions.CUSTOM:
-      return params.validator ? params.validator(this._actionTracking, data) : false;
+      case TutorialActions.CUSTOM:
+        return params.validator ? params.validator(this._actionTracking, data) : false;
 
-    default:
-      return false;
+      default:
+        return false;
     }
   }
 

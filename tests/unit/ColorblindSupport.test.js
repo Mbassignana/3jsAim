@@ -20,9 +20,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] || null),
-    setItem: vi.fn((key, value) => { store[key] = value; }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, value) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 
@@ -66,8 +72,14 @@ describe('ColorblindSupport', () => {
 
     it('should have all required colors in each palette', () => {
       const requiredColors = [
-        'target', 'targetAlt', 'targetMoving', 'targetBonus',
-        'hit', 'miss', 'danger', 'success',
+        'target',
+        'targetAlt',
+        'targetMoving',
+        'targetBonus',
+        'hit',
+        'miss',
+        'danger',
+        'success',
       ];
 
       for (const palette of Object.values(ExtendedPalettes)) {
@@ -157,13 +169,13 @@ describe('ColorblindSupport', () => {
       it('should route to correct simulation', () => {
         const hex = '#ff0000';
         expect(ColorSimulation.simulate(hex, 'protanopia')).toBe(
-          ColorSimulation.simulateProtanopia(hex),
+          ColorSimulation.simulateProtanopia(hex)
         );
         expect(ColorSimulation.simulate(hex, 'deuteranopia')).toBe(
-          ColorSimulation.simulateDeuteranopia(hex),
+          ColorSimulation.simulateDeuteranopia(hex)
         );
         expect(ColorSimulation.simulate(hex, 'tritanopia')).toBe(
-          ColorSimulation.simulateTritanopia(hex),
+          ColorSimulation.simulateTritanopia(hex)
         );
       });
 

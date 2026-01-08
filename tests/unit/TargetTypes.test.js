@@ -138,7 +138,9 @@ describe('TargetTypes', () => {
     describe('STREAK target', () => {
       it('should have streak behavior with high speed', () => {
         expect(TargetTypes.STREAK.behavior.type).toBe('streak');
-        expect(TargetTypes.STREAK.behavior.speed).toBeGreaterThan(TargetTypes.MOVING.behavior.speed);
+        expect(TargetTypes.STREAK.behavior.speed).toBeGreaterThan(
+          TargetTypes.MOVING.behavior.speed
+        );
         expect(TargetTypes.STREAK.behavior.trailLength).toBeGreaterThan(0);
       });
 
@@ -264,8 +266,9 @@ describe('TargetTypes', () => {
       });
 
       it('should throw for unknown type', () => {
-        expect(() => TargetFactory.create('nonexistent', { x: 0, y: 0, z: 0 }))
-          .toThrow('Unknown target type: nonexistent');
+        expect(() => TargetFactory.create('nonexistent', { x: 0, y: 0, z: 0 })).toThrow(
+          'Unknown target type: nonexistent'
+        );
       });
 
       it('should set correct initial properties', () => {
@@ -282,11 +285,15 @@ describe('TargetTypes', () => {
       });
 
       it('should allow custom options', () => {
-        const target = TargetFactory.create('standard', { x: 0, y: 0, z: 0 }, {
-          radius: 2.0,
-          health: 5,
-          points: 100,
-        });
+        const target = TargetFactory.create(
+          'standard',
+          { x: 0, y: 0, z: 0 },
+          {
+            radius: 2.0,
+            health: 5,
+            points: 100,
+          }
+        );
 
         expect(target.radius).toBe(2.0);
         expect(target.health).toBe(5);
@@ -510,8 +517,10 @@ describe('TargetTypes', () => {
         manager.on('target:expired', callback);
 
         // Update until target shrinks past minimum
-        const shrinkTime = (target.radius - TargetTypes.SHRINKING.behavior.minRadius) /
-          TargetTypes.SHRINKING.behavior.shrinkRate + 0.1;
+        const shrinkTime =
+          (target.radius - TargetTypes.SHRINKING.behavior.minRadius) /
+            TargetTypes.SHRINKING.behavior.shrinkRate +
+          0.1;
         manager.update(shrinkTime);
 
         expect(callback).toHaveBeenCalled();
@@ -538,8 +547,8 @@ describe('TargetTypes', () => {
         manager.addTarget(target);
 
         // Update to just before flash threshold
-        const flashTime = TargetTypes.BONUS.behavior.lifetime -
-          TargetTypes.BONUS.behavior.flashThreshold + 0.1;
+        const flashTime =
+          TargetTypes.BONUS.behavior.lifetime - TargetTypes.BONUS.behavior.flashThreshold + 0.1;
         manager.update(flashTime);
 
         expect(target.behaviorState.isFlashing).toBe(true);
@@ -560,7 +569,8 @@ describe('TargetTypes', () => {
 
         // Children should have moved
         for (let i = 0; i < children.length; i++) {
-          const moved = children[i].position.x !== initialPositions[i].x ||
+          const moved =
+            children[i].position.x !== initialPositions[i].x ||
             children[i].position.y !== initialPositions[i].y;
           expect(moved).toBe(true);
         }
@@ -607,8 +617,7 @@ describe('TargetTypes', () => {
 
         // Should have moved significantly
         const distance = Math.sqrt(
-          (target.position.x - initialPos.x) ** 2 +
-          (target.position.y - initialPos.y) ** 2,
+          (target.position.x - initialPos.x) ** 2 + (target.position.y - initialPos.y) ** 2
         );
         expect(distance).toBeGreaterThan(0);
       });
@@ -634,7 +643,7 @@ describe('TargetTypes', () => {
         }
 
         expect(target.behaviorState.trail.length).toBeLessThanOrEqual(
-          TargetTypes.STREAK.behavior.trailLength,
+          TargetTypes.STREAK.behavior.trailLength
         );
       });
     });
@@ -757,7 +766,7 @@ describe('TargetTypes', () => {
         const result = manager.processHit(target.id);
 
         const expectedPoints = Math.round(
-          TargetTypes.SHRINKING.basePoints * TargetTypes.SHRINKING.behavior.bonusMultiplier,
+          TargetTypes.SHRINKING.basePoints * TargetTypes.SHRINKING.behavior.bonusMultiplier
         );
         expect(result.points).toBe(expectedPoints);
       });

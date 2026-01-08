@@ -345,8 +345,7 @@ export class ParticleEmitter {
 
     this._particlesEmitted += toEmit;
 
-    if (this.config.duration === 0 ||
-        this._particlesEmitted >= this.config.particleCount) {
+    if (this.config.duration === 0 || this._particlesEmitted >= this.config.particleCount) {
       this._isComplete = true;
     }
   }
@@ -406,7 +405,9 @@ export class ParticleEmitter {
       endColor: config.endColor,
       alpha: 1.0,
       rotation: 0,
-      rotationSpeed: config.rotationSpeed ? randomRange(-config.rotationSpeed, config.rotationSpeed) : 0,
+      rotationSpeed: config.rotationSpeed
+        ? randomRange(-config.rotationSpeed, config.rotationSpeed)
+        : 0,
       drag: config.drag ?? 1,
       fadeOut: config.fadeOut ?? true,
       type: config.type || 'circle',
@@ -425,52 +426,52 @@ export class ParticleEmitter {
     const spread = this.config.spread || 0;
 
     switch (this.config.type) {
-    case 'point': {
-      // Random direction
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      return {
-        x: Math.sin(phi) * Math.cos(theta) * speed,
-        y: Math.sin(phi) * Math.sin(theta) * speed,
-        z: Math.cos(phi) * speed,
-      };
-    }
+      case 'point': {
+        // Random direction
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        return {
+          x: Math.sin(phi) * Math.cos(theta) * speed,
+          y: Math.sin(phi) * Math.sin(theta) * speed,
+          z: Math.cos(phi) * speed,
+        };
+      }
 
-    case 'cone': {
-      // Direction with spread
-      const baseAngle = Math.atan2(this.direction.y, this.direction.x);
-      const angle = baseAngle + randomRange(-spread / 2, spread / 2);
-      const upAngle = randomRange(-spread / 4, spread / 4);
-      return {
-        x: Math.cos(angle) * Math.cos(upAngle) * speed,
-        y: Math.sin(angle) * Math.cos(upAngle) * speed,
-        z: Math.sin(upAngle) * speed,
-      };
-    }
+      case 'cone': {
+        // Direction with spread
+        const baseAngle = Math.atan2(this.direction.y, this.direction.x);
+        const angle = baseAngle + randomRange(-spread / 2, spread / 2);
+        const upAngle = randomRange(-spread / 4, spread / 4);
+        return {
+          x: Math.cos(angle) * Math.cos(upAngle) * speed,
+          y: Math.sin(angle) * Math.cos(upAngle) * speed,
+          z: Math.sin(upAngle) * speed,
+        };
+      }
 
-    case 'sphere': {
-      // Random direction (same as point)
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      return {
-        x: Math.sin(phi) * Math.cos(theta) * speed,
-        y: Math.sin(phi) * Math.sin(theta) * speed,
-        z: Math.cos(phi) * speed,
-      };
-    }
+      case 'sphere': {
+        // Random direction (same as point)
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        return {
+          x: Math.sin(phi) * Math.cos(theta) * speed,
+          y: Math.sin(phi) * Math.sin(theta) * speed,
+          z: Math.cos(phi) * speed,
+        };
+      }
 
-    case 'trail': {
-      // Small random offset from direction
-      const variance = 0.2;
-      return {
-        x: (this.direction.x + randomRange(-variance, variance)) * speed,
-        y: (this.direction.y + randomRange(-variance, variance)) * speed,
-        z: (this.direction.z + randomRange(-variance, variance)) * speed,
-      };
-    }
+      case 'trail': {
+        // Small random offset from direction
+        const variance = 0.2;
+        return {
+          x: (this.direction.x + randomRange(-variance, variance)) * speed,
+          y: (this.direction.y + randomRange(-variance, variance)) * speed,
+          z: (this.direction.z + randomRange(-variance, variance)) * speed,
+        };
+      }
 
-    default:
-      return { x: 0, y: speed, z: 0 };
+      default:
+        return { x: 0, y: speed, z: 0 };
     }
   }
 
@@ -564,7 +565,9 @@ export class ParticleSystem extends EventEmitter {
     /** @type {ObjectPool} */
     this._particlePool = new ObjectPool({
       factory: () => ({}),
-      reset: (p) => { p.isActive = false; },
+      reset: (p) => {
+        p.isActive = false;
+      },
       maxSize: this._maxParticles,
     });
 

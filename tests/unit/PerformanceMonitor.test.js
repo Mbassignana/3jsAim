@@ -205,10 +205,12 @@ describe('PerformanceMonitor', () => {
       monitor.on('update', callback);
       monitor._frameTimes = [16, 16, 16];
       monitor._updateStats();
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        fps: expect.any(Number),
-        avgFps: expect.any(Number),
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          fps: expect.any(Number),
+          avgFps: expect.any(Number),
+        })
+      );
     });
 
     it('should handle empty frame times', () => {

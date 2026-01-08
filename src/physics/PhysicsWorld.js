@@ -243,9 +243,7 @@ export class PhysicsWorld extends EventEmitter {
   addStaticBox(type, x, y, z, width, height, depth) {
     if (!this.world) return null;
 
-    const boxShape = new this._CANNON.Box(
-      new this._CANNON.Vec3(width / 2, height / 2, depth / 2)
-    );
+    const boxShape = new this._CANNON.Box(new this._CANNON.Vec3(width / 2, height / 2, depth / 2));
     const body = new this._CANNON.Body({
       mass: 0,
       material: this.materials.building,
@@ -327,9 +325,7 @@ export class PhysicsWorld extends EventEmitter {
 
     const { mass = 50 } = options;
 
-    const npcShape = new this._CANNON.Box(
-      new this._CANNON.Vec3(width / 2, height / 2, depth / 2)
-    );
+    const npcShape = new this._CANNON.Box(new this._CANNON.Vec3(width / 2, height / 2, depth / 2));
     const npcBody = new this._CANNON.Body({
       mass,
       material: this.materials.npc,

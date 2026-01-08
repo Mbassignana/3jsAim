@@ -88,9 +88,9 @@ class ExpiringEntityManager extends TestEntityManager {
 describe('GameEntity', () => {
   describe('Abstract class enforcement', () => {
     it('should throw when instantiating GameEntity directly', () => {
-      expect(() => new GameEntity({ id: 'test', type: 'test', position: { x: 0, y: 0, z: 0 } })).toThrow(
-        'GameEntity is abstract'
-      );
+      expect(
+        () => new GameEntity({ id: 'test', type: 'test', position: { x: 0, y: 0, z: 0 } })
+      ).toThrow('GameEntity is abstract');
     });
 
     it('should allow instantiation of concrete subclass', () => {

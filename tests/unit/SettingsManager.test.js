@@ -19,9 +19,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] || null),
-    setItem: vi.fn((key, value) => { store[key] = value; }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, value) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 
@@ -196,7 +202,9 @@ describe('SettingsManager', () => {
   describe('get()', () => {
     it('should get nested value by path', () => {
       expect(settings.get('audio.masterVolume')).toBe(DefaultSettings.audio.masterVolume);
-      expect(settings.get('controls.mouseSensitivity')).toBe(DefaultSettings.controls.mouseSensitivity);
+      expect(settings.get('controls.mouseSensitivity')).toBe(
+        DefaultSettings.controls.mouseSensitivity
+      );
     });
 
     it('should return undefined for invalid path', () => {

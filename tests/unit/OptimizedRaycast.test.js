@@ -330,7 +330,10 @@ describe('OptimizedRaycast', () => {
       });
 
       it('should clear targets', () => {
-        raycaster.setTargets([{ x: 10, y: 0 }, { x: 20, y: 0 }]);
+        raycaster.setTargets([
+          { x: 10, y: 0 },
+          { x: 20, y: 0 },
+        ]);
         raycaster.clearTargets();
         expect(raycaster.getTargetCount()).toBe(0);
       });
@@ -642,11 +645,7 @@ describe('OptimizedRaycast', () => {
           { x: 50, y: 50, type: 'enemy' }, // atan(50/50) ≈ 0.79 rad, outside
         ];
 
-        const hits = strategy.cast(
-          { x: 0, y: 0, angle: 0 },
-          targets,
-          { coneAngle: 0.15 }
-        );
+        const hits = strategy.cast({ x: 0, y: 0, angle: 0 }, targets, { coneAngle: 0.15 });
 
         expect(hits.length).toBe(2);
       });
@@ -674,11 +673,7 @@ describe('OptimizedRaycast', () => {
     describe('checkTarget', () => {
       it('should check single target', () => {
         const target = { x: 50, y: 0, type: 'enemy' };
-        const result = strategy.checkTarget(
-          { x: 0, y: 0, angle: 0 },
-          target,
-          { index: 5 }
-        );
+        const result = strategy.checkTarget({ x: 0, y: 0, angle: 0 }, target, { index: 5 });
 
         expect(result).not.toBeNull();
         expect(result.index).toBe(5);
@@ -686,10 +681,7 @@ describe('OptimizedRaycast', () => {
 
       it('should return null for missed target', () => {
         const target = { x: 50, y: 50, type: 'enemy' };
-        const result = strategy.checkTarget(
-          { x: 0, y: 0, angle: 0 },
-          target
-        );
+        const result = strategy.checkTarget({ x: 0, y: 0, angle: 0 }, target);
 
         expect(result).toBeNull();
       });
@@ -783,19 +775,13 @@ describe('OptimizedRaycast', () => {
       raycaster.resetStats();
 
       // With firstOnly, should stop after first hit
-      raycaster.cast(
-        { x: 0, y: 0, angle: 0, maxRange: 2000 },
-        { firstOnly: true }
-      );
+      raycaster.cast({ x: 0, y: 0, angle: 0, maxRange: 2000 }, { firstOnly: true });
 
       const firstOnlyChecks = raycaster.stats.checks;
       raycaster.resetStats();
 
       // Without firstOnly, checks all
-      raycaster.cast(
-        { x: 0, y: 0, angle: 0, maxRange: 2000 },
-        { firstOnly: false }
-      );
+      raycaster.cast({ x: 0, y: 0, angle: 0, maxRange: 2000 }, { firstOnly: false });
 
       const allChecks = raycaster.stats.checks;
 

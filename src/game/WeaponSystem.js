@@ -498,9 +498,7 @@ export class WeaponSystem extends EventEmitter {
    * @returns {WeaponConfig|null}
    */
   static getWeaponById(id) {
-    return Weapons[id.toUpperCase()] ||
-      Object.values(Weapons).find((w) => w.id === id) ||
-      null;
+    return Weapons[id.toUpperCase()] || Object.values(Weapons).find((w) => w.id === id) || null;
   }
 
   /**
@@ -602,8 +600,10 @@ export class WeaponSystem extends EventEmitter {
         return; // Reload was cancelled
       }
 
-      if (this._state.currentAmmo >= this._currentWeapon.ammo.clipSize ||
-          this._state.reserveAmmo <= 0) {
+      if (
+        this._state.currentAmmo >= this._currentWeapon.ammo.clipSize ||
+        this._state.reserveAmmo <= 0
+      ) {
         this._state.isReloading = false;
         this.emit('weapon:reload:complete', {
           weapon: this._currentWeapon,

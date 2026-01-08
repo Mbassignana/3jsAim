@@ -57,18 +57,9 @@ describe('InputManager', () => {
   describe('init', () => {
     it('should attach event listeners', () => {
       manager.init(mockTarget);
-      expect(mockTarget.addEventListener).toHaveBeenCalledWith(
-        'keydown',
-        expect.any(Function)
-      );
-      expect(mockTarget.addEventListener).toHaveBeenCalledWith(
-        'keyup',
-        expect.any(Function)
-      );
-      expect(mockTarget.addEventListener).toHaveBeenCalledWith(
-        'mousemove',
-        expect.any(Function)
-      );
+      expect(mockTarget.addEventListener).toHaveBeenCalledWith('keydown', expect.any(Function));
+      expect(mockTarget.addEventListener).toHaveBeenCalledWith('keyup', expect.any(Function));
+      expect(mockTarget.addEventListener).toHaveBeenCalledWith('mousemove', expect.any(Function));
     });
   });
 
@@ -86,9 +77,7 @@ describe('InputManager', () => {
     });
 
     it('should track key down', () => {
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keydown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keydown')[1];
 
       handler({ code: 'KeyW', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
       expect(manager.isKeyDown('KeyW')).toBe(true);
@@ -99,9 +88,7 @@ describe('InputManager', () => {
       const keydownHandler = mockTarget.addEventListener.mock.calls.find(
         (c) => c[0] === 'keydown'
       )[1];
-      const keyupHandler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keyup'
-      )[1];
+      const keyupHandler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keyup')[1];
 
       keydownHandler({ code: 'KeyW', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
       keyupHandler({ code: 'KeyW' });
@@ -114,9 +101,7 @@ describe('InputManager', () => {
       const callback = vi.fn();
       manager.on('actionDown', callback);
 
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keydown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keydown')[1];
       handler({ code: 'KeyW', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
 
       expect(callback).toHaveBeenCalledWith({
@@ -126,9 +111,7 @@ describe('InputManager', () => {
     });
 
     it('should ignore input from INPUT elements', () => {
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keydown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keydown')[1];
 
       handler({ code: 'KeyW', target: { tagName: 'INPUT' }, preventDefault: vi.fn() });
       expect(manager.isKeyDown('KeyW')).toBe(false);
@@ -137,9 +120,7 @@ describe('InputManager', () => {
     it('should not process keys while paused (except pause key)', () => {
       manager.pause();
 
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keydown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keydown')[1];
       handler({ code: 'KeyW', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
 
       expect(manager.isKeyDown('KeyW')).toBe(false);
@@ -158,9 +139,7 @@ describe('InputManager', () => {
     });
 
     it('should return forward movement', () => {
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keydown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keydown')[1];
       handler({ code: 'KeyW', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
 
       const input = manager.getMovementInput();
@@ -168,9 +147,7 @@ describe('InputManager', () => {
     });
 
     it('should normalize diagonal movement', () => {
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keydown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keydown')[1];
       handler({ code: 'KeyW', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
       handler({ code: 'KeyD', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
 
@@ -213,9 +190,7 @@ describe('InputManager', () => {
 
     it('should handle pause key', () => {
       manager.init(mockTarget);
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keydown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keydown')[1];
 
       handler({ code: 'Escape', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
       expect(manager.isPaused).toBe(true);
@@ -228,9 +203,7 @@ describe('InputManager', () => {
     });
 
     it('should track mouse buttons', () => {
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'mousedown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'mousedown')[1];
       handler({ button: 0 });
       expect(manager.isMouseButtonDown(0)).toBe(true);
     });
@@ -239,9 +212,7 @@ describe('InputManager', () => {
       const callback = vi.fn();
       manager.on('shoot', callback);
 
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'mousedown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'mousedown')[1];
       handler({ button: 0 });
 
       expect(callback).toHaveBeenCalled();
@@ -252,9 +223,7 @@ describe('InputManager', () => {
       const callback = vi.fn();
       manager.on('shoot', callback);
 
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'mousedown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'mousedown')[1];
       handler({ button: 0 });
 
       expect(callback).not.toHaveBeenCalled();
@@ -302,9 +271,7 @@ describe('InputManager', () => {
     });
 
     it('should detect sprinting', () => {
-      const handler = mockTarget.addEventListener.mock.calls.find(
-        (c) => c[0] === 'keydown'
-      )[1];
+      const handler = mockTarget.addEventListener.mock.calls.find((c) => c[0] === 'keydown')[1];
       handler({ code: 'ShiftLeft', target: { tagName: 'DIV' }, preventDefault: vi.fn() });
       expect(manager.isSprinting()).toBe(true);
     });

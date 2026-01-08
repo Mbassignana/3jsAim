@@ -39,7 +39,16 @@ describe('PowerUpSystem', () => {
     });
 
     it('should have required properties on each type', () => {
-      const requiredProps = ['id', 'name', 'description', 'color', 'duration', 'spawnWeight', 'icon', 'effect'];
+      const requiredProps = [
+        'id',
+        'name',
+        'description',
+        'color',
+        'duration',
+        'spawnWeight',
+        'icon',
+        'effect',
+      ];
 
       Object.values(PowerUpTypes).forEach((type) => {
         requiredProps.forEach((prop) => {
@@ -258,9 +267,7 @@ describe('PowerUpSystem', () => {
       system.spawn('slow_motion', 100, 100);
       system.tryCollect(100, 100);
 
-      expect(system.getEffectTimeRemaining('slow_motion')).toBe(
-        PowerUpTypes.SLOW_MOTION.duration
-      );
+      expect(system.getEffectTimeRemaining('slow_motion')).toBe(PowerUpTypes.SLOW_MOTION.duration);
 
       vi.advanceTimersByTime(1000);
 
@@ -346,7 +353,8 @@ describe('PowerUpSystem', () => {
         system.tryCollect(50, 0);
 
         // Should be remaining + new duration
-        const expected = PowerUpTypes.SLOW_MOTION.duration - 1000 + PowerUpTypes.SLOW_MOTION.duration;
+        const expected =
+          PowerUpTypes.SLOW_MOTION.duration - 1000 + PowerUpTypes.SLOW_MOTION.duration;
         expect(system.getEffectTimeRemaining('slow_motion')).toBe(expected);
       });
     });

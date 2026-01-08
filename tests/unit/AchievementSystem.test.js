@@ -20,9 +20,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: vi.fn((key) => store[key] || null),
-    setItem: vi.fn((key, value) => { store[key] = value; }),
-    removeItem: vi.fn((key) => { delete store[key]; }),
-    clear: vi.fn(() => { store = {}; }),
+    setItem: vi.fn((key, value) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
   };
 })();
 
@@ -381,10 +387,7 @@ describe('AchievementSystem', () => {
     it('should save stats to localStorage', () => {
       achievements.onGameEnd({ hits: 10, score: 100 });
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'lifetime_stats',
-        expect.any(String),
-      );
+      expect(localStorageMock.setItem).toHaveBeenCalledWith('lifetime_stats', expect.any(String));
     });
 
     it('should reset session stats', () => {
@@ -427,9 +430,7 @@ describe('AchievementSystem', () => {
       }
 
       // Should have progress events for centurion
-      const progressEvents = callback.mock.calls.filter(
-        (c) => c[0].achievement.id === 'centurion',
-      );
+      const progressEvents = callback.mock.calls.filter((c) => c[0].achievement.id === 'centurion');
       expect(progressEvents.length).toBeGreaterThan(0);
     });
 
@@ -442,7 +443,7 @@ describe('AchievementSystem', () => {
 
       // Should only unlock first_blood once
       const firstBloodUnlocks = callback.mock.calls.filter(
-        (c) => c[0].achievement.id === 'first_blood',
+        (c) => c[0].achievement.id === 'first_blood'
       );
       expect(firstBloodUnlocks).toHaveLength(1);
     });
@@ -527,7 +528,7 @@ describe('AchievementSystem', () => {
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'achievement_progress',
-        expect.any(String),
+        expect.any(String)
       );
     });
   });

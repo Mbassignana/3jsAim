@@ -37,12 +37,15 @@ const _requestIdleCallback =
     ? requestIdleCallback
     : (callback, options = {}) => {
         const start = Date.now();
-        return setTimeout(() => {
-          callback({
-            didTimeout: false,
-            timeRemaining: () => Math.max(0, 50 - (Date.now() - start)),
-          });
-        }, options.timeout ? Math.min(options.timeout, 1) : 1);
+        return setTimeout(
+          () => {
+            callback({
+              didTimeout: false,
+              timeRemaining: () => Math.max(0, 50 - (Date.now() - start)),
+            });
+          },
+          options.timeout ? Math.min(options.timeout, 1) : 1
+        );
       };
 
 const _cancelIdleCallback =
@@ -281,10 +284,9 @@ export class IdleScheduler extends EventEmitter {
       }
     }
 
-    this._idleCallbackId = _requestIdleCallback(
-      (deadline) => this._processIdleTasks(deadline),
-      { timeout: minTimeout }
-    );
+    this._idleCallbackId = _requestIdleCallback((deadline) => this._processIdleTasks(deadline), {
+      timeout: minTimeout,
+    });
   }
 
   /**

@@ -336,10 +336,7 @@ export class AudioManager extends EventEmitter {
     }
 
     if (fadeOut > 0) {
-      this._musicGain.gain.linearRampToValueAtTime(
-        0,
-        this._context.currentTime + fadeOut
-      );
+      this._musicGain.gain.linearRampToValueAtTime(0, this._context.currentTime + fadeOut);
       setTimeout(() => {
         if (this._currentMusic) {
           try {

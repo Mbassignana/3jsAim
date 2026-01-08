@@ -5,11 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import {
-  NPCManager,
-  DEFAULT_NPC_TYPES,
-  DEFAULT_CONFIG,
-} from '@/game/NPCManager.js';
+import { NPCManager, DEFAULT_NPC_TYPES, DEFAULT_CONFIG } from '@/game/NPCManager.js';
 import { GameEvents, resetEventBus, getEventBus } from '@/utils/EventEmitter.js';
 
 // Mock scene
@@ -65,15 +61,11 @@ describe('NPCManager', () => {
   // ==========================================================================
   describe('constructor', () => {
     it('should throw if scene is missing', () => {
-      expect(
-        () => new NPCManager({ physicsWorld: mockPhysicsWorld })
-      ).toThrow('requires a scene');
+      expect(() => new NPCManager({ physicsWorld: mockPhysicsWorld })).toThrow('requires a scene');
     });
 
     it('should throw if physicsWorld is missing', () => {
-      expect(() => new NPCManager({ scene: mockScene })).toThrow(
-        'requires a physicsWorld'
-      );
+      expect(() => new NPCManager({ scene: mockScene })).toThrow('requires a physicsWorld');
     });
 
     it('should initialize with default config', () => {
@@ -98,7 +90,13 @@ describe('NPCManager', () => {
 
     it('should accept custom NPC types', () => {
       const customTypes = [
-        { name: 'custom', color: 0xff0000, size: { width: 1, height: 1, depth: 1 }, speed: 3, wanderRadius: 20 },
+        {
+          name: 'custom',
+          color: 0xff0000,
+          size: { width: 1, height: 1, depth: 1 },
+          speed: 3,
+          wanderRadius: 20,
+        },
       ];
       const customManager = new NPCManager({
         scene: mockScene,

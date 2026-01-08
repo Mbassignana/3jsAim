@@ -61,11 +61,13 @@ test.describe('Game Application', () => {
 
       // Menu should be hidden or game UI should be visible
       const menu = page.locator('#menu, .menu');
-      const menuHidden = await menu.evaluate((el) => {
-        if (!el) return true;
-        const style = window.getComputedStyle(el);
-        return style.display === 'none' || style.visibility === 'hidden';
-      }).catch(() => true);
+      const menuHidden = await menu
+        .evaluate((el) => {
+          if (!el) return true;
+          const style = window.getComputedStyle(el);
+          return style.display === 'none' || style.visibility === 'hidden';
+        })
+        .catch(() => true);
 
       // Game should have started (menu hidden or game elements visible)
       const gameUI = page.locator('#score, .score, #timer, .timer, #crosshair, .crosshair');
@@ -120,7 +122,7 @@ test.describe('Game Application', () => {
     test('should attempt pointer lock on game start', async ({ page }) => {
       await page.evaluate(() => {
         const originalRequestPointerLock = Element.prototype.requestPointerLock;
-        Element.prototype.requestPointerLock = function() {
+        Element.prototype.requestPointerLock = function () {
           window.__pointerLockRequested = true;
           return originalRequestPointerLock?.call(this);
         };
@@ -132,7 +134,9 @@ test.describe('Game Application', () => {
 
       await page.waitForTimeout(500);
 
-      const _pointerLockRequested = await page.evaluate(() => window.__pointerLockRequested || false);
+      const _pointerLockRequested = await page.evaluate(
+        () => window.__pointerLockRequested || false
+      );
 
       // Pointer lock should be requested for FPS game
       // (may not always succeed due to browser security)
@@ -297,7 +301,7 @@ test.describe('Game End and Restart', () => {
     const endCount = await endScreen.count();
     if (endCount > 0) {
       // If end screen exists, verify it has expected content
-      const hasScore = await page.locator(':has-text("Score"), :has-text("score")').count() > 0;
+      const hasScore = (await page.locator(':has-text("Score"), :has-text("score")').count()) > 0;
       expect(hasScore).toBe(true);
     }
   });
@@ -337,7 +341,7 @@ test.describe('Accessibility', () => {
     await page.goto('/');
 
     // Check for basic accessibility elements
-    const hasTitle = await page.title() !== '';
+    const hasTitle = (await page.title()) !== '';
     expect(hasTitle).toBe(true);
 
     // Check for buttons with accessible names

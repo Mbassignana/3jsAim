@@ -217,9 +217,10 @@ const Validators = {
   crosshairThickness: (v) => Math.max(1, Math.min(5, Math.round(v))),
   crosshairOpacity: (v) => Math.max(0, Math.min(100, Math.round(v))),
   textScale: (v) => Math.max(0.75, Math.min(1.5, v)),
-  quality: (v) => ['low', 'medium', 'high', 'ultra'].includes(v) ? v : 'high',
-  colorblindMode: (v) => ['off', 'protanopia', 'deuteranopia', 'tritanopia'].includes(v) ? v : 'off',
-  crosshairStyle: (v) => ['default', 'dot', 'cross', 'circle'].includes(v) ? v : 'cross',
+  quality: (v) => (['low', 'medium', 'high', 'ultra'].includes(v) ? v : 'high'),
+  colorblindMode: (v) =>
+    ['off', 'protanopia', 'deuteranopia', 'tritanopia'].includes(v) ? v : 'off',
+  crosshairStyle: (v) => (['default', 'dot', 'cross', 'circle'].includes(v) ? v : 'cross'),
 };
 
 // ==========================================================================
@@ -389,9 +390,10 @@ export class SettingsManager extends EventEmitter {
    */
   getEffectiveVolume(type) {
     const master = this._settings.audio.masterVolume / 100;
-    const specific = type === 'sfx'
-      ? this._settings.audio.sfxVolume / 100
-      : this._settings.audio.musicVolume / 100;
+    const specific =
+      type === 'sfx'
+        ? this._settings.audio.sfxVolume / 100
+        : this._settings.audio.musicVolume / 100;
     return master * specific;
   }
 

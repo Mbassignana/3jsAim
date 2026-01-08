@@ -59,9 +59,7 @@ describe('CircleManager', () => {
     });
 
     it('should throw if physicsWorld is missing', () => {
-      expect(() => new CircleManager({ scene: mockScene })).toThrow(
-        'requires a physicsWorld'
-      );
+      expect(() => new CircleManager({ scene: mockScene })).toThrow('requires a physicsWorld');
     });
 
     it('should initialize with default config', () => {

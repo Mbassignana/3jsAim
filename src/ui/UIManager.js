@@ -211,9 +211,7 @@ export class UIManager extends EventEmitter {
       // Clear existing content
       this._elements.finalScore.textContent = '';
       // Create text nodes and elements safely
-      this._elements.finalScore.appendChild(
-        document.createTextNode(`Final Score: ${finalScore}`)
-      );
+      this._elements.finalScore.appendChild(document.createTextNode(`Final Score: ${finalScore}`));
       const br = document.createElement('br');
       this._elements.finalScore.appendChild(br);
       const span = document.createElement('span');

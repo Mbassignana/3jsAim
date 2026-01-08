@@ -36,7 +36,7 @@
 - [ ] 27. Add level-of-detail (LOD) system for distant objects
 - [ ] 28. Optimize raycasting with early-exit and bounding box pre-checks
 - [ ] 29. Implement requestIdleCallback for non-critical updates
-- [ ] 30. Add performance monitoring and FPS counter with throttling
+- [x] 30. Add performance monitoring and FPS counter with throttling
 
 ## Gameplay Features (31-40)
 - [x] 31. Add difficulty levels (Easy, Medium, Hard) with different spawn rates
@@ -65,7 +65,7 @@
 - [x] 50. Add pause functionality with escape key
 
 ---
-**Progress:** 23/50 completed
-**Last Updated:** 2026-01-07 20:39
+**Progress:** 24/50 completed
+**Last Updated:** 2026-01-07 20:43
 **Current Focus:** Continue with more features and testing
 **Blockers:** None

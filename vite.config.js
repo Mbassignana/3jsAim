@@ -5,6 +5,7 @@ export default defineConfig({
   root: '.',
   publicDir: 'assets',
   resolve: {
+    extensions: ['.ts', '.js', '.mjs', '.json'],
     alias: {
       '@': resolve(__dirname, './src'),
       '@game': resolve(__dirname, './src/game'),

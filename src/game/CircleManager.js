@@ -5,7 +5,7 @@
 
 import { GameConfig } from './GameConfig.js';
 import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
-import { randomRange, randomInt } from '../utils/math.js';
+import { randomRange, randomInt } from '../utils/math';
 
 /**
  * @typedef {Object} CircleData

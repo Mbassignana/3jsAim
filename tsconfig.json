@@ -14,12 +14,15 @@
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
     "types": ["vitest/globals", "node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@game/*": ["./src/game/*"],
       "@physics/*": ["./src/physics/*"],
+      "@scene/*": ["./src/scene/*"],
       "@ui/*": ["./src/ui/*"],
       "@utils/*": ["./src/utils/*"]
     }

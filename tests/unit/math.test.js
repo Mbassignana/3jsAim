@@ -15,7 +15,7 @@ import {
   normalizeAngle,
   smoothStep,
   smootherStep,
-} from '@/utils/math.js';
+} from '@/utils/math';
 
 describe('clamp', () => {
   it('should return value when within range', () => {

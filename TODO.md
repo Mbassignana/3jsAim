@@ -2,7 +2,7 @@
 
 ## Testing Infrastructure (1-10)
 - [x] 1. Set up Jest testing framework with jsdom for browser environment simulation
-- [ ] 2. Create unit tests for `CanvasFPSGame` class (game state, scoring, timing)
+- [x] 2. Create unit tests for `CanvasFPSGame` class (game state, scoring, timing)
 - [x] 3. Create unit tests for `CircleManager` (spawn, destroy, collision detection)
 - [ ] 4. Create unit tests for `NPCManager` (spawn, AI behavior, wandering logic)
 - [ ] 5. Create unit tests for `Player` class (movement, shooting, physics interaction)
@@ -65,7 +65,7 @@
 - [x] 50. Add pause functionality with escape key
 
 ---
-**Progress:** 26/50 completed
-**Last Updated:** 2026-01-07 20:48
-**Current Focus:** Continue with more features and testing
+**Progress:** 27/50 completed
+**Last Updated:** 2026-01-07 21:41
+**Current Focus:** Item 4 - NPCManager unit tests
 **Blockers:** None

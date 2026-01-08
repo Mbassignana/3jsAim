@@ -5,7 +5,7 @@
 - [x] 2. Create unit tests for `CanvasFPSGame` class (game state, scoring, timing)
 - [x] 3. Create unit tests for `CircleManager` (spawn, destroy, collision detection)
 - [x] 4. Create unit tests for `NPCManager` (spawn, AI behavior, wandering logic)
-- [ ] 5. Create unit tests for `Player` class (movement, shooting, physics interaction)
+- [x] 5. Create unit tests for `Player` class (movement, shooting, physics interaction)
 - [ ] 6. Create unit tests for `UIManager` (state transitions, score display, timer)
 - [ ] 7. Create unit tests for `PhysicsWorld` (collision detection, raycast, body management)
 - [ ] 8. Create unit tests for `SceneManager` (building generation, safe spawn positions)
@@ -65,7 +65,7 @@
 - [x] 50. Add pause functionality with escape key
 
 ---
-**Progress:** 28/50 completed
-**Last Updated:** 2026-01-07 21:44
-**Current Focus:** Item 5 - Player class unit tests
+**Progress:** 29/50 completed
+**Last Updated:** 2026-01-07 21:47
+**Current Focus:** Item 6 - UIManager unit tests
 **Blockers:** None

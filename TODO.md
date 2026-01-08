@@ -48,7 +48,7 @@
 - [x] 37. Add target variety (moving targets, shrinking targets, bonus targets)
 - [x] 38. Create tutorial/practice mode with guided instructions
 - [x] 39. Add statistics tracking (accuracy, reaction time, best streaks)
-- [ ] 40. Implement achievement system with unlockables
+- [x] 40. Implement achievement system with unlockables
 
 ## Audio & Visual Enhancements (41-45)
 - [x] 41. Add sound effects (gunshots, hits, misses, ambient sounds)
@@ -65,7 +65,7 @@
 - [x] 50. Add pause functionality with escape key
 
 ---
-**Progress:** 46/50 completed (+ partial 16)
-**Last Updated:** 2026-01-07 23:02
-**Current Focus:** Item 40 - Implement achievement system with unlockables
+**Progress:** 47/50 completed (+ partial 16)
+**Last Updated:** 2026-01-07 23:06
+**Current Focus:** Item 43 - Add particle effects for wall impacts and near-misses
 **Blockers:** None

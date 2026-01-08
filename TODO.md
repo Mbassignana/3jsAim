@@ -53,7 +53,7 @@
 ## Audio & Visual Enhancements (41-45)
 - [x] 41. Add sound effects (gunshots, hits, misses, ambient sounds)
 - [x] 42. Implement background music with volume controls
-- [ ] 43. Add particle effects for wall impacts and near-misses
+- [x] 43. Add particle effects for wall impacts and near-misses
 - [x] 44. Implement screen shake on shooting
 - [x] 45. Add visual feedback for accuracy (hit markers, kill confirms)
 
@@ -65,7 +65,7 @@
 - [x] 50. Add pause functionality with escape key
 
 ---
-**Progress:** 47/50 completed (+ partial 16)
-**Last Updated:** 2026-01-07 23:06
-**Current Focus:** Item 43 - Add particle effects for wall impacts and near-misses
+**Progress:** 48/50 completed (+ partial 16)
+**Last Updated:** 2026-01-07 23:10
+**Current Focus:** Item 46 - Add settings menu (sensitivity, volume, graphics quality)
 **Blockers:** None

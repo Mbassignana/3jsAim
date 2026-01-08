@@ -44,7 +44,7 @@
 - [x] 33. Add power-ups (slow motion, double points, auto-aim assist)
 - [x] 34. Create multiple game modes (Time Attack, Survival, Precision)
 - [x] 35. Add leaderboard with localStorage persistence
-- [ ] 36. Implement weapon variety (pistol, rifle, shotgun with spread)
+- [x] 36. Implement weapon variety (pistol, rifle, shotgun with spread)
 - [ ] 37. Add target variety (moving targets, shrinking targets, bonus targets)
 - [ ] 38. Create tutorial/practice mode with guided instructions
 - [x] 39. Add statistics tracking (accuracy, reaction time, best streaks)
@@ -65,7 +65,7 @@
 - [x] 50. Add pause functionality with escape key
 
 ---
-**Progress:** 43/50 completed (+ partial 16)
-**Last Updated:** 2026-01-07 22:49
-**Current Focus:** Item 36 - Implement weapon variety (pistol, rifle, shotgun with spread)
+**Progress:** 44/50 completed (+ partial 16)
+**Last Updated:** 2026-01-07 22:52
+**Current Focus:** Item 37 - Add target variety (moving targets, shrinking targets, bonus targets)
 **Blockers:** None

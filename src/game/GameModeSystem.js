@@ -330,7 +330,7 @@ export class GameModeSystem extends EventEmitter {
    * @param {Object} [missData] - Optional miss data
    * @returns {{points: number, newScore: number, gameOver: boolean}}
    */
-  registerMiss(missData = {}) {
+  registerMiss(_missData = {}) {
     if (!this._state.isActive) {
       return { points: 0, newScore: this._state.score, gameOver: false };
     }

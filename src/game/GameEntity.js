@@ -92,7 +92,7 @@ export class GameEntity {
    * @param {number} deltaTime - Time since last update in seconds
    * @abstract
    */
-  update(deltaTime) {
+  update(_deltaTime) {
     throw new Error('GameEntity.update() must be implemented by subclass');
   }
 
@@ -338,7 +338,7 @@ export class EntityManager extends EventEmitter {
    * @abstract
    * @protected
    */
-  _createEntity(id, position, options = {}) {
+  _createEntity(id, position, _options = {}) {
     throw new Error('EntityManager._createEntity() must be implemented by subclass');
   }
 
@@ -483,7 +483,7 @@ export class EntityManager extends EventEmitter {
    * @returns {boolean}
    * @protected
    */
-  _shouldExpire(entity) {
+  _shouldExpire(_entity) {
     return false; // Default: entities don't expire
   }
 

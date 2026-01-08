@@ -2,9 +2,9 @@
  * Unit tests for GameEntity abstract base classes
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { GameEntity, EntityManager, EntityState } from '@game/GameEntity.js';
 import { getEventBus, resetEventBus, GameEvents } from '@utils/EventEmitter.js';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // ==========================================================================
 // Concrete Test Implementations

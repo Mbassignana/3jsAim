@@ -3,7 +3,7 @@
  * Separates UI logic from DOM manipulation for testability
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
+import { EventEmitter } from '../utils/EventEmitter.js';
 
 /**
  * @typedef {Object} UIElements

@@ -12,6 +12,7 @@
  */
 
 import { EventEmitter, GameEvents } from '../utils/EventEmitter.js';
+
 import {
   TargetingSystem,
   Canvas2DRaycastStrategy,
@@ -483,7 +484,7 @@ export class CanvasFPSGame extends EventEmitter {
    * Update circle animations and remove expired circles
    * @param {number} deltaTime - Time since last update in seconds
    */
-  updateCircles(deltaTime) {
+  updateCircles(_deltaTime) {
     const now = Date.now();
 
     // Update floating animation

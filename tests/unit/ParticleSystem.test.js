@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
 import {
   ParticleSystem,
   ParticleEmitter,
@@ -570,7 +571,7 @@ describe('ParticleSystem', () => {
       });
 
       it('should allow option overrides', () => {
-        const emitter = particleSystem.createFromPreset('WALL_IMPACT', { x: 0, y: 0, z: 0 }, {
+        const _emitter = particleSystem.createFromPreset('WALL_IMPACT', { x: 0, y: 0, z: 0 }, {
           particleCount: 5,
         });
 

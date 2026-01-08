@@ -3,7 +3,7 @@
  * Handles building generation, lighting, ground, props, and spawn positions
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
+import { EventEmitter } from '../utils/EventEmitter.js';
 
 /**
  * @typedef {Object} BuildingConfig

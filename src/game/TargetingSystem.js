@@ -3,7 +3,7 @@
  * Abstracts the common targeting logic for both Three.js and Canvas 2D renderers
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
+import { EventEmitter } from '../utils/EventEmitter.js';
 
 // ==========================================================================
 // Target Types
@@ -70,7 +70,7 @@ export class RaycastStrategy {
    * @param {Object} options - Raycast options
    * @returns {Array<RaycastHit>} Hits sorted by distance
    */
-  cast(origin, targets, options = {}) {
+  cast(origin, targets, _options = {}) {
     throw new Error('RaycastStrategy.cast() must be implemented');
   }
 
@@ -81,7 +81,7 @@ export class RaycastStrategy {
    * @param {Object} options - Options
    * @returns {RaycastHit|null}
    */
-  checkTarget(origin, target, options = {}) {
+  checkTarget(origin, target, _options = {}) {
     throw new Error('RaycastStrategy.checkTarget() must be implemented');
   }
 }

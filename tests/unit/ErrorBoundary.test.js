@@ -3,7 +3,6 @@
  * Tests error handling, custom error classes, and recovery mechanisms
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   ErrorBoundary,
   GameError,
@@ -17,6 +16,7 @@ import {
   resetErrorBoundary,
 } from '@utils/ErrorBoundary.js';
 import { GameEvents, getEventBus, resetEventBus } from '@utils/EventEmitter.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 describe('ErrorBoundary', () => {
   let errorBoundary;

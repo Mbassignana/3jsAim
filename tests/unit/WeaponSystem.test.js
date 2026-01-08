@@ -2,14 +2,13 @@
  * Tests for WeaponSystem - Weapon variety with different characteristics
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   WeaponSystem,
   Weapons,
-  DEFAULT_WEAPON,
   getWeaponSystem,
   resetWeaponSystem,
 } from '@game/WeaponSystem.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 describe('WeaponSystem', () => {
   let system;
@@ -339,7 +338,7 @@ describe('WeaponSystem', () => {
 
       // Check that pellets have spread
       const angles = result.pellets.map((p) => p.angle);
-      const uniqueAngles = new Set(angles);
+      const _uniqueAngles = new Set(angles);
 
       // With random spread, angles should vary
       // (might rarely be same due to randomness, so check has spread potential)

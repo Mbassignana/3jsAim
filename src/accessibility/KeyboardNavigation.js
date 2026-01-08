@@ -3,7 +3,7 @@
  * Implements WAI-ARIA best practices for accessible navigation
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
+import { EventEmitter } from '../utils/EventEmitter.js';
 
 // ==========================================================================
 // Types

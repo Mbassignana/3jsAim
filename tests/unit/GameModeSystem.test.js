@@ -2,14 +2,13 @@
  * Tests for GameModeSystem - Game modes with different rules and scoring
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   GameModeSystem,
   GameModes,
-  DEFAULT_MODE,
   getGameModeSystem,
   resetGameModeSystem,
 } from '@game/GameModeSystem.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 describe('GameModeSystem', () => {
   let system;

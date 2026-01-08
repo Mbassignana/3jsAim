@@ -6,17 +6,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Import game systems
-import { createGameStateMachine, GameStates, GameActions } from '@/game/StateMachine.js';
-import { DifficultyManager, DifficultyLevel, DifficultyPresets, resetDifficultyManager } from '@/game/DifficultyManager.js';
-import { ComboSystem, resetComboSystem } from '@/game/ComboSystem.js';
-import { StatsTracker, resetStatsTracker } from '@/game/StatsTracker.js';
-import { Leaderboard, resetLeaderboard } from '@/game/Leaderboard.js';
-import { InputManager, resetInputManager } from '@/game/InputManager.js';
-import { resetAudioManager } from '@/game/AudioManager.js';
-import { ScreenShake, resetScreenShake } from '@/effects/ScreenShake.js';
 import { HitMarker, resetHitMarker } from '@/effects/HitMarker.js';
-import { GameEvents, getEventBus, resetEventBus } from '@/utils/EventEmitter.js';
+import { ScreenShake, resetScreenShake } from '@/effects/ScreenShake.js';
+import { resetAudioManager } from '@/game/AudioManager.js';
+import { ComboSystem, resetComboSystem } from '@/game/ComboSystem.js';
+import { DifficultyManager, DifficultyLevel, DifficultyPresets, resetDifficultyManager } from '@/game/DifficultyManager.js';
 import { GameConfig } from '@/game/GameConfig.js';
+import { InputManager, resetInputManager } from '@/game/InputManager.js';
+import { Leaderboard, resetLeaderboard } from '@/game/Leaderboard.js';
+import { createGameStateMachine, GameStates, GameActions } from '@/game/StateMachine.js';
+import { StatsTracker, resetStatsTracker } from '@/game/StatsTracker.js';
+import { GameEvents, getEventBus, resetEventBus } from '@/utils/EventEmitter.js';
 
 describe('Game Flow Integration', () => {
   let stateMachine;

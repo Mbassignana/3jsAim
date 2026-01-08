@@ -3,7 +3,7 @@
  * Enhances raycasting performance using bounding box pre-checks and Quadtree integration
  */
 
-import { Quadtree, createCenteredQuadtree } from './Quadtree.js';
+import { createCenteredQuadtree } from './Quadtree.js';
 
 // ==========================================================================
 // Types

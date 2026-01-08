@@ -125,7 +125,7 @@ export class ComboSystem extends EventEmitter {
    * @param {Object} [hitData] - Optional data about the hit
    * @returns {{points: number, multiplier: number, combo: number, tierUp: boolean}}
    */
-  registerHit(hitData = {}) {
+  registerHit(_hitData = {}) {
     this._clearTimeout();
     this._totalHits++;
 
@@ -167,7 +167,7 @@ export class ComboSystem extends EventEmitter {
    * @param {Object} [missData] - Optional data about the miss
    * @returns {{lostCombo: number, hadCombo: boolean}}
    */
-  registerMiss(missData = {}) {
+  registerMiss(_missData = {}) {
     this._clearTimeout();
     this._totalMisses++;
 

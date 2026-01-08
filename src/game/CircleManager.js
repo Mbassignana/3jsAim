@@ -3,9 +3,10 @@
  * ES6 modular version with event emitter integration
  */
 
-import { GameConfig } from './GameConfig.js';
 import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
 import { randomRange, randomInt } from '../utils/math';
+
+import { GameConfig } from './GameConfig.js';
 
 /**
  * @typedef {Object} CircleData

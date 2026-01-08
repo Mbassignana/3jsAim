@@ -3,7 +3,6 @@
  * Tests tutorial progression, action tracking, and practice mode
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   TutorialSystem,
   TutorialActions,
@@ -12,6 +11,7 @@ import {
   getTutorialSystem,
   resetTutorialSystem,
 } from '@game/TutorialSystem.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // Mock localStorage
 const localStorageMock = (() => {

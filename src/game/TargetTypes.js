@@ -379,7 +379,7 @@ export class TargetFactory {
       state.phaseTime = 0;
       break;
 
-    case 'streak':
+    case 'streak': {
       state.direction = options.direction ?? {
         x: (Math.random() - 0.5) * 2,
         y: (Math.random() - 0.5) * 2,
@@ -398,6 +398,7 @@ export class TargetFactory {
       }
       state.trail = [];
       break;
+    }
     }
 
     return state;
@@ -604,7 +605,6 @@ export class TargetBehaviorManager extends EventEmitter {
    */
   _updateTargetBehavior(target, deltaTime) {
     const behavior = target.config.behavior;
-    const state = target.behaviorState;
 
     switch (behavior.type) {
     case 'static':
@@ -641,7 +641,7 @@ export class TargetBehaviorManager extends EventEmitter {
    * Update moving target
    * @private
    */
-  _updateMovingTarget(target, deltaTime) {
+  _updateMovingTarget(target, _deltaTime) {
     const behavior = target.config.behavior;
     const state = target.behaviorState;
     const pattern = MovementPatterns[state.pattern] || MovementPatterns.linear;
@@ -673,7 +673,7 @@ export class TargetBehaviorManager extends EventEmitter {
    * Update bonus target
    * @private
    */
-  _updateBonusTarget(target, deltaTime) {
+  _updateBonusTarget(target, _deltaTime) {
     const behavior = target.config.behavior;
     const state = target.behaviorState;
     const timeRemaining = behavior.lifetime - state.elapsedTime;
@@ -719,7 +719,7 @@ export class TargetBehaviorManager extends EventEmitter {
    * Update armored target
    * @private
    */
-  _updateArmoredTarget(target, deltaTime) {
+  _updateArmoredTarget(target, _deltaTime) {
     const state = target.behaviorState;
 
     // Update flash state

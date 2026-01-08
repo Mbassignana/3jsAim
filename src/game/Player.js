@@ -155,7 +155,7 @@ export class Player extends EventEmitter {
    * @param {boolean} active - Whether movement is active
    */
   setMovement(direction, active) {
-    if (this.movement.hasOwnProperty(direction)) {
+    if (Object.hasOwn(this.movement, direction)) {
       this.movement[direction] = active;
     }
   }

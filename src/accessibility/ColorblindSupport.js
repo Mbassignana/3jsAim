@@ -3,8 +3,8 @@
  * Transforms game colors for different types of color vision deficiency
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
 import { getSettingsManager } from '../ui/SettingsManager.js';
+import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
 
 // ==========================================================================
 // Types

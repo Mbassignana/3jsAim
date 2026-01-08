@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import {
   NPCManager,
   DEFAULT_NPC_TYPES,
@@ -318,7 +319,7 @@ describe('NPCManager', () => {
         const id = manager.spawnNPCAt(0, 0);
         const data = manager.getNPCData(id);
         data.idleTimer = 0.1;
-        const initialTarget = { ...data.targetPosition };
+        const _initialTarget = { ...data.targetPosition };
 
         manager.update(0.2);
 

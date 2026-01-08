@@ -3,7 +3,6 @@
  * Tests target type definitions, factory, and behavior management
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   TargetTypes,
   DEFAULT_TARGET_TYPE,
@@ -13,6 +12,7 @@ import {
   getTargetBehaviorManager,
   resetTargetBehaviorManager,
 } from '@game/TargetTypes.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 describe('TargetTypes', () => {
   // ==========================================================================
@@ -186,7 +186,7 @@ describe('TargetTypes', () => {
         const pos0 = MovementPatterns.circular(0, config, startPos);
         const pos25 = MovementPatterns.circular(0.25, config, startPos);
         const pos50 = MovementPatterns.circular(0.5, config, startPos);
-        const pos75 = MovementPatterns.circular(0.75, config, startPos);
+        const _pos75 = MovementPatterns.circular(0.75, config, startPos);
 
         // At time 0, should be at (amplitude, 0)
         expect(pos0.x).toBeCloseTo(config.amplitude, 1);
@@ -205,8 +205,8 @@ describe('TargetTypes', () => {
     describe('random pattern', () => {
       it('should update position based on direction', () => {
         const state = {};
-        const pos1 = MovementPatterns.random(0, config, startPos, state);
-        const pos2 = MovementPatterns.random(0.016, config, startPos, state);
+        const _pos1 = MovementPatterns.random(0, config, startPos, state);
+        const _pos2 = MovementPatterns.random(0.016, config, startPos, state);
 
         // Should have set direction
         expect(state.direction).toBeDefined();
@@ -217,7 +217,7 @@ describe('TargetTypes', () => {
       it('should change direction periodically', () => {
         const state = { lastDirectionChange: 0 };
         MovementPatterns.random(0, config, startPos, state);
-        const dir1 = { ...state.direction };
+        const _dir1 = { ...state.direction };
 
         MovementPatterns.random(2, config, startPos, state); // After 2 seconds
         // Direction should have changed

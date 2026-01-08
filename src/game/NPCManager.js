@@ -251,9 +251,9 @@ export class NPCManager extends EventEmitter {
    * @param {number} deltaTime - Time since last update in seconds
    */
   update(deltaTime) {
-    for (const [id, { mesh, data }] of this._npcs) {
-      this._updateNPCBehavior(mesh, data, deltaTime);
-      this._syncMeshPosition(mesh, data);
+    for (const entry of this._npcs.values()) {
+      this._updateNPCBehavior(entry.mesh, entry.data, deltaTime);
+      this._syncMeshPosition(entry.mesh, entry.data);
     }
   }
 

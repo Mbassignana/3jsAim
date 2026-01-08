@@ -497,7 +497,7 @@ export class TutorialSystem extends EventEmitter {
       this._actionTracking.shotsFired++;
       break;
 
-    case TutorialActions.HIT_TARGET:
+    case TutorialActions.HIT_TARGET: {
       this._actionTracking.targetsHit++;
       const now = Date.now();
       if (now - this._actionTracking.lastHitTime < 2000) {
@@ -507,6 +507,7 @@ export class TutorialSystem extends EventEmitter {
       }
       this._actionTracking.lastHitTime = now;
       break;
+    }
     }
 
     // Check if step action is completed (only in tutorial mode)
@@ -628,7 +629,7 @@ export class TutorialSystem extends EventEmitter {
     case TutorialActions.PAUSE:
       return action === TutorialActions.PAUSE;
 
-    case TutorialActions.HIT_STREAK:
+    case TutorialActions.HIT_STREAK: {
       const required = params.count || 3;
       if (params.maxTime) {
         // Check if streak was achieved within time limit
@@ -639,6 +640,7 @@ export class TutorialSystem extends EventEmitter {
         }
       }
       return this._actionTracking.consecutiveHits >= required;
+    }
 
     case TutorialActions.SCORE_POINTS:
       return (data.score || 0) >= (params.threshold || 100);

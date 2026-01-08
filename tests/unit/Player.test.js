@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { Player, DEFAULT_CONFIG } from '@/game/Player.js';
 import { GameEvents, resetEventBus, getEventBus } from '@/utils/EventEmitter.js';
 

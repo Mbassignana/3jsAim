@@ -3,7 +3,6 @@
  * Tests achievement tracking, unlocking, and rewards
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   AchievementSystem,
   Achievements,
@@ -14,6 +13,7 @@ import {
   getAchievementSystem,
   resetAchievementSystem,
 } from '@game/AchievementSystem.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -266,7 +266,7 @@ describe('AchievementSystem', () => {
         achievements.trackEvent('hit', {});
 
         // Streak should be 1, not 3
-        const stats = achievements.getLifetimeStats();
+        const _stats = achievements.getLifetimeStats();
         // Note: maxStreak from session would be 2
       });
 

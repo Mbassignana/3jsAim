@@ -3,7 +3,7 @@
  * Each weapon has distinct fire rate, spread, damage, and behavior
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
+import { EventEmitter, getEventBus } from '../utils/EventEmitter.js';
 
 // ==========================================================================
 // Types

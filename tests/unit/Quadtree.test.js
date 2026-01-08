@@ -2,7 +2,6 @@
  * Unit tests for Quadtree spatial partitioning
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
 import {
   Quadtree,
   createQuadtreeFromObjects,
@@ -10,6 +9,7 @@ import {
   findAllCollisions,
   checkCollision,
 } from '@utils/Quadtree.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('Quadtree', () => {
   let tree;
@@ -481,17 +481,17 @@ describe('Performance characteristics', () => {
 
     // Quadtree query
     const qtStart = performance.now();
-    const qtResults = tree.query(range);
+    const _qtResults = tree.query(range);
     const qtTime = performance.now() - qtStart;
 
     // Brute force for comparison
     const bfStart = performance.now();
-    const bfResults = items.filter((item) => {
+    const _bfResults = items.filter((item) => {
       return (
         item.x >= -250 && item.x <= 250 && item.y >= -250 && item.y <= 250
       );
     });
-    const bfTime = performance.now() - bfStart;
+    const _bfTime = performance.now() - bfStart;
 
     // Quadtree should be competitive (and faster for sparse queries)
     expect(qtTime).toBeLessThan(50);

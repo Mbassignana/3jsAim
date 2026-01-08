@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import {
   CanvasFPSGame,
   GameState,
@@ -694,7 +695,7 @@ describe('CanvasFPSGame', () => {
 
     it('should change direction after 2 seconds', () => {
       const npc = game.npcs[0];
-      const initialAngle = npc.moveAngle;
+      const _initialAngle = npc.moveAngle;
       npc.moveTimer = 2.1;
       game.updateNPCs(0.016);
       // Direction should have been reset to a new random value
@@ -845,7 +846,7 @@ describe('CanvasFPSGame', () => {
     });
 
     it('should spawn new circles at spawn interval', () => {
-      const initialCount = game.circles.length;
+      const _initialCount = game.circles.length;
       game.spawnTimer = game.config.spawnInterval - 0.1;
       game.update(0.2);
       // Spawn timer should reset and new circles should spawn

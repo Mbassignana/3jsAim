@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { CircleManager } from '@/game/CircleManager.js';
 import { GameEvents, resetEventBus, getEventBus } from '@/utils/EventEmitter.js';
 

@@ -2,7 +2,6 @@
  * Unit tests for LODSystem
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import {
   LODSystem,
   LODMeshHelper,
@@ -11,6 +10,7 @@ import {
   getLODSystem,
   resetLODSystem,
 } from '@utils/LODSystem.js';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 describe('LODSystem', () => {
   let lod;

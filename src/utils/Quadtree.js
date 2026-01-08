@@ -40,24 +40,6 @@ const DEFAULT_MAX_DEPTH = 8;
 // ==========================================================================
 
 /**
- * Check if a point is inside a rectangle
- * @param {number} px - Point X
- * @param {number} py - Point Y
- * @param {Rectangle} rect - Rectangle
- * @returns {boolean}
- */
-function pointInRect(px, py, rect) {
-  const halfW = rect.width / 2;
-  const halfH = rect.height / 2;
-  return (
-    px >= rect.x - halfW &&
-    px <= rect.x + halfW &&
-    py >= rect.y - halfH &&
-    py <= rect.y + halfH
-  );
-}
-
-/**
  * Check if two rectangles intersect
  * @param {Rectangle} a - First rectangle
  * @param {Rectangle} b - Second rectangle

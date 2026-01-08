@@ -3,7 +3,7 @@
  * Persists statistics across sessions
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
+import { EventEmitter } from '../utils/EventEmitter.js';
 
 /**
  * @typedef {Object} GameStats

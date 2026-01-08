@@ -3,7 +3,6 @@
  * Tests building generation, town layout, safe spawn positions, and scene setup
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   SceneManager,
   DEFAULT_BUILDING_CONFIGS,
@@ -12,6 +11,7 @@ import {
   DEFAULT_CRATE_POSITIONS,
   SCENE_CONFIG,
 } from '@scene/SceneManager.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 /**
  * Create a mock Three.js library

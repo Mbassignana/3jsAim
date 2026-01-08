@@ -118,9 +118,6 @@ test.describe('Game Application', () => {
 
   test.describe('Pointer Lock', () => {
     test('should attempt pointer lock on game start', async ({ page }) => {
-      // Track pointer lock requests
-      let pointerLockRequested = false;
-
       await page.evaluate(() => {
         const originalRequestPointerLock = Element.prototype.requestPointerLock;
         Element.prototype.requestPointerLock = function() {
@@ -135,7 +132,7 @@ test.describe('Game Application', () => {
 
       await page.waitForTimeout(500);
 
-      pointerLockRequested = await page.evaluate(() => window.__pointerLockRequested || false);
+      const _pointerLockRequested = await page.evaluate(() => window.__pointerLockRequested || false);
 
       // Pointer lock should be requested for FPS game
       // (may not always succeed due to browser security)
@@ -159,7 +156,7 @@ test.describe('Game Application', () => {
         '.paused, #pauseMenu, [data-testid="pause"], :has-text("Paused"), :has-text("Resume")'
       );
 
-      const pauseCount = await pauseIndicator.count();
+      const _pauseCount = await pauseIndicator.count();
       // Game may be paused - this depends on game implementation
     });
   });

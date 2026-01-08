@@ -2,7 +2,7 @@
  * Unit tests for LevelManager - Enhanced gameplay loop
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 // Mock the LevelManager class functionality
 class MockLevelManager {

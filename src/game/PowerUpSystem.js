@@ -3,7 +3,7 @@
  * Provides temporary gameplay enhancements like slow motion, double points, and auto-aim
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
+import { EventEmitter, getEventBus } from '../utils/EventEmitter.js';
 
 // ==========================================================================
 // Types
@@ -571,7 +571,7 @@ export class PowerUpSystem extends EventEmitter {
     const existing = this._activeEffects.get(type.id);
 
     let duration = type.duration;
-    let startTime = now;
+    const startTime = now;
 
     // Stack duration if enabled and effect already active
     if (existing && this._config.stackEffects && now < existing.endTime) {

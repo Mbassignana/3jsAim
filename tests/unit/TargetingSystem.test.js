@@ -3,7 +3,6 @@
  * Tests unified raycasting and target detection
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import {
   TargetingSystem,
   Canvas2DRaycastStrategy,
@@ -14,6 +13,7 @@ import {
   createCanvas2DTargeting,
   createThreeJSTargeting,
 } from '@game/TargetingSystem.js';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 describe('TargetingSystem', () => {
   describe('TargetType', () => {

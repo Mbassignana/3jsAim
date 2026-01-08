@@ -3,7 +3,7 @@
  * Handles collision detection, raycasting, and body management
  */
 
-import { EventEmitter, GameEvents, getEventBus } from '../utils/EventEmitter.js';
+import { EventEmitter } from '../utils/EventEmitter.js';
 
 /**
  * @typedef {Object} PhysicsConfig
@@ -538,7 +538,7 @@ export class PhysicsWorld extends EventEmitter {
    * @param {number} z - Z position
    * @returns {number} Ground height (currently always 0 for flat ground)
    */
-  getGroundHeight(x, z) {
+  getGroundHeight(_x, _z) {
     // For now, return 0 since we have a flat ground
     return 0;
   }

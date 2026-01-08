@@ -2,7 +2,6 @@
  * Tests for PowerUpSystem - Power-up spawning and effects
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   PowerUpSystem,
   PowerUpTypes,
@@ -10,6 +9,7 @@ import {
   getPowerUpSystem,
   resetPowerUpSystem,
 } from '@game/PowerUpSystem.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 describe('PowerUpSystem', () => {
   let system;
@@ -136,7 +136,7 @@ describe('PowerUpSystem', () => {
 
   describe('despawning', () => {
     it('should despawn after lifetime expires', () => {
-      const powerUp = system.spawn('slow_motion', 0, 0, { lifetime: 1000 });
+      const _powerUp = system.spawn('slow_motion', 0, 0, { lifetime: 1000 });
       expect(system.getPowerUpCount()).toBe(1);
 
       vi.advanceTimersByTime(1100);
@@ -321,7 +321,7 @@ describe('PowerUpSystem', () => {
         system.spawn('slow_motion', 0, 0);
         system.tryCollect(0, 0);
 
-        const initialEnd = system.getActiveEffect('slow_motion').endTime;
+        const _initialEnd = system.getActiveEffect('slow_motion').endTime;
 
         vi.advanceTimersByTime(1000);
 
@@ -454,7 +454,7 @@ describe('PowerUpSystem', () => {
       system.startSpawning();
 
       vi.advanceTimersByTime(DEFAULT_POWERUP_CONFIG.spawnInterval);
-      const count = system.getPowerUpCount();
+      const _count = system.getPowerUpCount();
 
       system.stopSpawning();
       vi.advanceTimersByTime(DEFAULT_POWERUP_CONFIG.spawnInterval * 5);
@@ -465,7 +465,7 @@ describe('PowerUpSystem', () => {
 
     it('should use position validator', () => {
       let validatorCalled = false;
-      system.setPositionValidator((x, y) => {
+      system.setPositionValidator((_x, _y) => {
         validatorCalled = true;
         return false; // Reject all positions
       });
@@ -504,7 +504,7 @@ describe('PowerUpSystem', () => {
       system.setEnabledTypes(['DOUBLE_POINTS', 'auto_aim']);
 
       const powerUp1 = system.spawnRandom(0, 0);
-      const powerUp2 = system.spawnRandom(50, 0);
+      const _powerUp2 = system.spawnRandom(50, 0);
 
       expect(['double_points', 'auto_aim']).toContain(powerUp1?.type);
     });

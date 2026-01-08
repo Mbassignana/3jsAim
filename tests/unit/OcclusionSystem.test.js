@@ -49,7 +49,7 @@ const mockTHREE = {
             this.origin = origin;
             this.direction = direction;
         }
-        intersectObjects(objects, recursive) {
+        intersectObjects(_objects, _recursive) {
             // Return mock intersections that can be configured per test
             return this._mockIntersects;
         }
@@ -376,13 +376,13 @@ describe('OcclusionSystem', () => {
             const wall = mockScene.addWall(5, 5, 0);
             manager.setOcclusionObjects([wall]);
 
-            const visibleCircle = manager.addCircle(-10, 5, -10);
+            const _visibleCircle = manager.addCircle(-10, 5, -10);
             const occludedCircle = manager.addCircle(10, 5, 0);
 
             // First circle has clear line of sight
             // Second circle is blocked by wall
-            const originalIntersects = manager.occlusionRaycaster.intersectObjects;
-            manager.occlusionRaycaster.intersectObjects = (objects) => {
+            const _originalIntersects = manager.occlusionRaycaster.intersectObjects;
+            manager.occlusionRaycaster.intersectObjects = (_objects) => {
                 // Check which circle we're testing by looking at current circle
                 return [{ distance: 3, object: wall }]; // Always return wall hit
             };
@@ -499,9 +499,9 @@ describe('OcclusionSystem', () => {
             manager.setCamera(camera);
 
             // Add multiple walls and buildings
-            const wall1 = mockScene.addWall(5, 2, 0);
-            const wall2 = mockScene.addWall(10, 2, 0);
-            const building = mockScene.addBuilding(15, 5, 0);
+            const _wall1 = mockScene.addWall(5, 2, 0);
+            const _wall2 = mockScene.addWall(10, 2, 0);
+            const _building = mockScene.addBuilding(15, 5, 0);
 
             manager.buildOcclusionList();
             expect(manager.occlusionObjects.length).toBe(3);
@@ -512,7 +512,7 @@ describe('OcclusionSystem', () => {
             const manager = new MockCircleManager(mockScene, {}, null);
 
             // Start with camera at one position
-            let camera = createMockCamera(0, 1.7, 0);
+            const camera = createMockCamera(0, 1.7, 0);
             manager.setCamera(camera);
 
             const circle = manager.addCircle(10, 5, 10);
@@ -552,7 +552,7 @@ describe('OcclusionSystem', () => {
             const emptyScene = {
                 add: vi.fn(),
                 remove: vi.fn(),
-                traverse: function(callback) {} // No objects
+                traverse: function(_callback) {} // No objects
             };
 
             const manager = new MockCircleManager(emptyScene, {}, null);

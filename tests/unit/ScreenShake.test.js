@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import {
   ScreenShake,
   ShakePresets,
@@ -214,12 +215,12 @@ describe('ScreenShake', () => {
 
       // At 50% progress, linear decay = 0.5
       shake.update(50);
-      const halfway = Math.sqrt(shake.offsetX ** 2 + shake.offsetY ** 2);
+      const _halfway = Math.sqrt(shake.offsetX ** 2 + shake.offsetY ** 2);
 
       shake.reset();
       shake.shake({ intensity: 0.1, duration: 100, frequency: 20, decay: 'linear' });
       shake.update(10);
-      const early = Math.sqrt(shake.offsetX ** 2 + shake.offsetY ** 2);
+      const _early = Math.sqrt(shake.offsetX ** 2 + shake.offsetY ** 2);
 
       // Early should generally be larger than halfway (more intensity remaining)
       // Note: due to sine wave oscillation this isn't always true at every instant

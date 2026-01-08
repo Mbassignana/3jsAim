@@ -3,13 +3,13 @@
  * Tests collision detection, raycasting, body management, and physics simulation
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   PhysicsWorld,
   DEFAULT_CONFIG,
   MATERIAL_PROPERTIES,
   BodyType,
 } from '@physics/PhysicsWorld.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 /**
  * Create a mock CANNON.js library for testing
@@ -162,7 +162,7 @@ function createMockCannon() {
       this._contactMaterials.push(cm);
       mockContactMaterials.push(cm);
     }
-    step(fixedTimeStep, deltaTime, maxSubSteps) {
+    step(_fixedTimeStep, _deltaTime, _maxSubSteps) {
       // Simulate physics step
     }
     raycastClosest(from, to, options, result) {

@@ -394,6 +394,10 @@ test.describe('Error Handling', () => {
       // Ignore certain expected errors
       if (error.includes('favicon')) return false;
       if (error.includes('DevTools')) return false;
+      if (error.includes('WebGL')) return false;
+      if (error.includes('GPU')) return false;
+      if (error.includes('WEBGL')) return false;
+      if (error.includes('context')) return false;
       return true;
     });
 

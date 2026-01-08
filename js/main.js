@@ -86,7 +86,13 @@ class Game {
         this.player = new Player(this.camera, this.scene, this.physicsWorld);
         this.circleManager = new CircleManager(this.scene, this.physicsWorld, this.sceneManager);
         this.npcManager = new NPCManager(this.scene, this.physicsWorld, this.sceneManager);
-        
+
+        // Setup occlusion culling for circles and NPCs (hidden behind walls)
+        this.circleManager.setCamera(this.camera);
+        this.circleManager.buildOcclusionList();
+        this.npcManager.setCamera(this.camera);
+        this.npcManager.buildOcclusionList();
+
         // Setup raycasting for shooting
         this.player.onShoot = (hit) => this.handleShoot(hit);
     }
@@ -181,27 +187,30 @@ class Game {
     
     update(deltaTime) {
         if (!this.isRunning) return;
-        
+
         // Update physics
         this.physicsWorld.update(deltaTime);
-        
+
         // Update player
         this.player.update(deltaTime);
-        
+
+        // Update circles (animations, occlusion, auto-despawn)
+        this.circleManager.update(deltaTime);
+
         // Update NPCs
         this.npcManager.update(deltaTime);
-        
+
         // Update spawn timer
         this.spawnTimer += deltaTime;
         if (this.spawnTimer >= this.spawnInterval) {
             this.circleManager.spawnCircles(3); // Spawn 3 new circles
             this.spawnTimer = 0;
         }
-        
+
         // Update game timer
         this.gameTime -= deltaTime;
         this.ui.updateTimer(Math.max(0, this.gameTime));
-        
+
         if (this.gameTime <= 0) {
             this.endGame();
         }

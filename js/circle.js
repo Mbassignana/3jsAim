@@ -6,7 +6,7 @@ class CircleManager {
         this.sceneManager = sceneManager;
         this.circles = [];
         this.maxCircles = 12;
-        
+
         // Available colors for circles
         this.colors = [
             0xFF0000, // Red
@@ -18,20 +18,94 @@ class CircleManager {
             0xFF8000, // Orange
             0x8000FF  // Purple
         ];
-        
+
+        // Occlusion culling
+        this.occlusionRaycaster = new THREE.Raycaster();
+        this.camera = null; // Set by game when available
+        this.occlusionObjects = []; // Walls, buildings, props that block view
+
         this.init();
     }
     
     init() {
         // Pre-create circle geometries and materials for performance
         this.circleGeometry = new THREE.TorusGeometry(1, 0.3, 8, 16);
-        this.circleMaterials = this.colors.map(color => 
-            new THREE.MeshLambertMaterial({ 
+        this.circleMaterials = this.colors.map(color =>
+            new THREE.MeshLambertMaterial({
                 color: color,
                 emissive: color,
                 emissiveIntensity: 0.2
             })
         );
+    }
+
+    // Set camera reference for occlusion culling
+    setCamera(camera) {
+        this.camera = camera;
+    }
+
+    // Set objects that can occlude targets (walls, buildings, props)
+    setOcclusionObjects(objects) {
+        this.occlusionObjects = objects.filter(obj =>
+            obj.userData.type === 'building' ||
+            obj.userData.type === 'wall' ||
+            obj.userData.type === 'prop'
+        );
+    }
+
+    // Build occlusion objects from scene
+    buildOcclusionList() {
+        this.occlusionObjects = [];
+        this.scene.traverse((object) => {
+            if (object.isMesh &&
+                (object.userData.type === 'building' ||
+                 object.userData.type === 'wall' ||
+                 object.userData.type === 'prop')) {
+                this.occlusionObjects.push(object);
+            }
+        });
+    }
+
+    // Check if a circle is visible from the camera (not occluded by walls/buildings)
+    isCircleVisible(circle) {
+        if (!this.camera) return true; // Fallback if no camera set
+
+        // Direction from camera to circle
+        const direction = new THREE.Vector3();
+        direction.subVectors(circle.position, this.camera.position).normalize();
+
+        // Distance from camera to circle
+        const distanceToCircle = this.camera.position.distanceTo(circle.position);
+
+        // Set up raycaster from camera toward circle
+        this.occlusionRaycaster.set(this.camera.position, direction);
+        this.occlusionRaycaster.far = distanceToCircle;
+
+        // Check for intersections with occluding objects
+        const intersects = this.occlusionRaycaster.intersectObjects(this.occlusionObjects, true);
+
+        // If any intersection is closer than the circle, it's occluded
+        for (const hit of intersects) {
+            if (hit.distance < distanceToCircle - 1) { // Small threshold for edge cases
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Update visibility of all circles based on occlusion
+    updateOcclusion() {
+        if (!this.camera || this.occlusionObjects.length === 0) return;
+
+        for (const circle of this.circles) {
+            const wasVisible = circle.visible;
+            const isVisible = this.isCircleVisible(circle);
+            circle.visible = isVisible;
+
+            // Store occlusion state for debugging/effects
+            circle.userData.occluded = !isVisible;
+        }
     }
     
     spawnCircles(count = 5) {
@@ -173,22 +247,27 @@ class CircleManager {
     }
     
     update(deltaTime) {
+        // Update occlusion visibility first
+        this.updateOcclusion();
+
         // Update circle animations
         this.circles.forEach(circle => {
             // Floating animation
             const time = Date.now() * 0.001;
             const floatY = Math.sin(time * circle.userData.floatSpeed + circle.userData.floatOffset) * circle.userData.floatAmplitude;
             circle.position.y += floatY * deltaTime;
-            
+
             // Rotation animation
             circle.rotation.y += circle.userData.rotationSpeed * deltaTime;
             circle.rotation.x += circle.userData.rotationSpeed * 0.5 * deltaTime;
-            
-            // Pulsing glow effect
-            const pulseIntensity = 0.2 + Math.sin(time * 3 + circle.userData.floatOffset) * 0.1;
-            circle.material.emissiveIntensity = pulseIntensity;
+
+            // Pulsing glow effect (only when visible)
+            if (circle.visible) {
+                const pulseIntensity = 0.2 + Math.sin(time * 3 + circle.userData.floatOffset) * 0.1;
+                circle.material.emissiveIntensity = pulseIntensity;
+            }
         });
-        
+
         // Remove old circles (auto-despawn after 60 seconds)
         const currentTime = Date.now();
         this.circles = this.circles.filter(circle => {

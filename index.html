@@ -128,6 +128,94 @@
         #menu button:hover {
             background: #ff8533;
         }
+
+        .mode-btn {
+            background: #333;
+            color: #fff;
+            border: 2px solid #555;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .mode-btn:hover {
+            border-color: #ff6b00;
+            background: #444;
+        }
+
+        .mode-btn.active {
+            background: #ff6b00;
+            border-color: #ff6b00;
+        }
+
+        .arena-btn {
+            background: #333;
+            color: #fff;
+            border: 2px solid #555;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .arena-btn:hover {
+            border-color: #00ffff;
+            background: #444;
+        }
+
+        .arena-btn.active {
+            background: #00808080;
+            border-color: #00ffff;
+        }
+
+        #waveInfo {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            color: #00ffff;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        #streakInfo {
+            position: absolute;
+            top: 90px;
+            left: 20px;
+            color: #ffff00;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        #multiplierInfo {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            color: #ff00ff;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        #gameMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.9);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 150;
+        }
         
         #endScreen {
             position: absolute;
@@ -183,17 +271,51 @@
             <div id="crosshair" class="hidden"></div>
             <div id="score" class="hidden">Score: 0</div>
             <div id="timer" class="hidden">Time: 2:00</div>
+            <div id="waveInfo" class="hidden">Wave 1/5</div>
+            <div id="streakInfo" class="hidden"></div>
+            <div id="multiplierInfo" class="hidden">x1.0</div>
+            <div id="gameMessage"></div>
             <div id="debug"></div>
         </div>
         
         <div id="menu">
             <h1>3jsAim</h1>
             <p>First-Person Shooter (Canvas 2D Raycasting)</p>
-            <button onclick="startGame()">Start Game</button>
+
+            <div id="modeSelect" style="margin: 20px 0;">
+                <p style="color: #ff6b00; margin-bottom: 10px;">Select Game Mode:</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                    <button onclick="selectMode('classic')" class="mode-btn active" id="mode-classic">Classic</button>
+                    <button onclick="selectMode('flickShot')" class="mode-btn" id="mode-flickShot">Flick Shot</button>
+                    <button onclick="selectMode('tracking')" class="mode-btn" id="mode-tracking">Tracking</button>
+                    <button onclick="selectMode('reaction')" class="mode-btn" id="mode-reaction">Reaction</button>
+                    <button onclick="selectMode('precision')" class="mode-btn" id="mode-precision">Precision</button>
+                    <button onclick="selectMode('elimination')" class="mode-btn" id="mode-elimination">Elimination</button>
+                </div>
+                <p id="modeDescription" style="color: #aaa; font-size: 12px; margin-top: 10px;">
+                    Hit as many targets as possible within the time limit
+                </p>
+            </div>
+
+            <div id="arenaSelect" style="margin: 20px 0;">
+                <p style="color: #00ffff; margin-bottom: 10px;">Select Arena:</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                    <button onclick="selectArena('training')" class="arena-btn" id="arena-training">Training</button>
+                    <button onclick="selectArena('warehouse')" class="arena-btn" id="arena-warehouse">Warehouse</button>
+                    <button onclick="selectArena('urban')" class="arena-btn active" id="arena-urban">Urban</button>
+                    <button onclick="selectArena('maze')" class="arena-btn" id="arena-maze">Maze</button>
+                </div>
+                <p id="arenaDescription" style="color: #aaa; font-size: 12px; margin-top: 10px;">
+                    City streets with buildings
+                </p>
+            </div>
+
+            <button onclick="startGame()" style="font-size: 24px; padding: 20px 50px;">Start Game</button>
+
             <div style="margin-top: 20px; font-size: 14px; color: #ccc;">
                 <p>Controls: WASD to move, Mouse to look around, Click to shoot</p>
                 <p>Shoot circles (+10 points), Avoid shooting animals (-1 point)</p>
-                <p style="color: #ff6b00;">Note: Using 2D Canvas raycasting (no external libraries)</p>
+                <p>Build streaks for score multipliers!</p>
             </div>
         </div>
         
@@ -217,6 +339,33 @@
                 this.gameTime = 120;
                 this.score = 0;
                 this.isRunning = false;
+
+                // Level manager state
+                this.currentMode = 'classic';
+                this.currentWave = 1;
+                this.maxWaves = 5;
+                this.waveTimeRemaining = 30;
+                this.isWarmingUp = false;
+                this.warmupTimeRemaining = 0;
+
+                // Streak and multiplier system
+                this.streakCount = 0;
+                this.maxStreak = 0;
+                this.scoreMultiplier = 1.0;
+                this.lastHitTime = 0;
+                this.streakTimeout = 2000;
+
+                // Wave configurations by mode
+                this.modeConfigs = this.initModeConfigs();
+                this.targetPatterns = this.initTargetPatterns();
+
+                // Round stats
+                this.roundStats = {
+                    targetsHit: 0,
+                    targetsMissed: 0,
+                    accuracy: 0,
+                    maxStreak: 0
+                };
                 
                 // Player
                 this.player = {
@@ -233,25 +382,11 @@
                 this.mouse = { x: 0, y: 0, sensitivity: 0.002 };
                 
                 // World map (1 = wall, 0 = empty, 2 = building)
-                this.map = [
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                    [1,0,2,2,0,0,0,0,0,0,2,2,2,0,0,1],
-                    [1,0,2,2,0,0,0,0,0,0,0,0,2,0,0,1],
-                    [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
-                    [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
-                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                    [1,0,0,2,2,0,0,0,0,0,0,2,0,0,0,1],
-                    [1,0,0,2,2,0,0,0,0,0,0,2,0,0,0,1],
-                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                    [1,0,0,0,0,0,2,2,2,0,0,0,0,0,0,1],
-                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                    [1,0,2,0,0,0,0,0,0,0,0,0,0,2,0,1],
-                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-                ];
-                
+                // Arena configurations
+                this.arenas = this.initArenas();
+                this.currentArena = 'urban';
+                this.map = this.arenas[this.currentArena].map;
+
                 this.mapSize = 64;
                 
                 // Game objects
@@ -318,45 +453,388 @@
                     score: document.getElementById('score'),
                     timer: document.getElementById('timer'),
                     finalScore: document.getElementById('finalScore'),
-                    debug: document.getElementById('debug')
+                    debug: document.getElementById('debug'),
+                    waveInfo: document.getElementById('waveInfo'),
+                    streakInfo: document.getElementById('streakInfo'),
+                    multiplierInfo: document.getElementById('multiplierInfo'),
+                    gameMessage: document.getElementById('gameMessage'),
+                    modeDescription: document.getElementById('modeDescription')
                 };
+            }
+
+            initModeConfigs() {
+                return {
+                    classic: [
+                        { wave: 1, targets: 5, time: 30, spawnInterval: 4, pattern: 'floating' },
+                        { wave: 2, targets: 7, time: 30, spawnInterval: 3.5, pattern: 'floating' },
+                        { wave: 3, targets: 9, time: 30, spawnInterval: 3, pattern: 'strafing' },
+                        { wave: 4, targets: 11, time: 30, spawnInterval: 2.5, pattern: 'strafing' },
+                        { wave: 5, targets: 13, time: 30, spawnInterval: 2, pattern: 'erratic' }
+                    ],
+                    flickShot: [
+                        { wave: 1, targets: 8, time: 30, targetLifetime: 1.5, pattern: 'popup' },
+                        { wave: 2, targets: 10, time: 30, targetLifetime: 1.2, pattern: 'popup' },
+                        { wave: 3, targets: 12, time: 30, targetLifetime: 1.0, pattern: 'popup' },
+                        { wave: 4, targets: 14, time: 30, targetLifetime: 0.8, pattern: 'popup' },
+                        { wave: 5, targets: 16, time: 30, targetLifetime: 0.6, pattern: 'popup' }
+                    ],
+                    tracking: [
+                        { wave: 1, targets: 4, time: 30, speedMultiplier: 0.8, pattern: 'strafing' },
+                        { wave: 2, targets: 5, time: 30, speedMultiplier: 1.0, pattern: 'strafing' },
+                        { wave: 3, targets: 6, time: 30, speedMultiplier: 1.2, pattern: 'orbital' },
+                        { wave: 4, targets: 7, time: 30, speedMultiplier: 1.4, pattern: 'orbital' },
+                        { wave: 5, targets: 8, time: 30, speedMultiplier: 1.6, pattern: 'erratic' }
+                    ],
+                    reaction: [
+                        { wave: 1, targets: 12, time: 30, targetLifetime: 2.0, pattern: 'popup' },
+                        { wave: 2, targets: 15, time: 30, targetLifetime: 1.5, pattern: 'popup' },
+                        { wave: 3, targets: 18, time: 30, targetLifetime: 1.2, pattern: 'popup' },
+                        { wave: 4, targets: 21, time: 30, targetLifetime: 1.0, pattern: 'popup' },
+                        { wave: 5, targets: 25, time: 30, targetLifetime: 0.8, pattern: 'popup' }
+                    ],
+                    precision: [
+                        { wave: 1, targets: 6, time: 30, targetSize: 0.6, pattern: 'static' },
+                        { wave: 2, targets: 8, time: 30, targetSize: 0.5, pattern: 'static' },
+                        { wave: 3, targets: 10, time: 30, targetSize: 0.4, pattern: 'floating' },
+                        { wave: 4, targets: 12, time: 30, targetSize: 0.35, pattern: 'floating' },
+                        { wave: 5, targets: 14, time: 30, targetSize: 0.3, pattern: 'strafing' }
+                    ],
+                    elimination: [
+                        { wave: 1, targets: 8, time: 60, pattern: 'floating' },
+                        { wave: 2, targets: 12, time: 60, pattern: 'strafing' },
+                        { wave: 3, targets: 16, time: 60, pattern: 'strafing' },
+                        { wave: 4, targets: 20, time: 60, pattern: 'erratic' },
+                        { wave: 5, targets: 25, time: 60, pattern: 'erratic' }
+                    ]
+                };
+            }
+
+            initTargetPatterns() {
+                return {
+                    static: { movement: 'none', speedMultiplier: 0 },
+                    floating: { movement: 'float', speedMultiplier: 1.0 },
+                    strafing: { movement: 'strafe', speedMultiplier: 1.5 },
+                    popup: { movement: 'popup', speedMultiplier: 0 },
+                    erratic: { movement: 'erratic', speedMultiplier: 2.0 },
+                    orbital: { movement: 'orbit', speedMultiplier: 1.2 }
+                };
+            }
+
+            initArenas() {
+                return {
+                    // Training Room - Open space with minimal obstacles
+                    training: {
+                        name: 'Training Room',
+                        description: 'Open space for practice',
+                        floorColor: '#4a6741',
+                        skyColor: '#87CEEB',
+                        map: [
+                            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                        ]
+                    },
+                    // Warehouse - Indoor with crates and corridors
+                    warehouse: {
+                        name: 'Warehouse',
+                        description: 'Indoor with crates and cover',
+                        floorColor: '#5c5c5c',
+                        skyColor: '#3a3a3a',
+                        map: [
+                            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                            [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+                            [1,0,2,0,0,1,0,0,0,0,1,0,0,2,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
+                            [1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,2,0,0,0,0,0,0,0,0,2,0,0,1],
+                            [1,0,0,2,0,0,0,0,0,0,0,0,2,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+                            [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
+                            [1,0,2,0,0,0,0,0,0,0,0,0,0,2,0,1],
+                            [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+                            [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+                            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                        ]
+                    },
+                    // Urban - Current layout with buildings
+                    urban: {
+                        name: 'Urban',
+                        description: 'City streets with buildings',
+                        floorColor: '#654321',
+                        skyColor: '#87CEEB',
+                        map: [
+                            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,2,2,0,0,0,0,0,0,2,2,2,0,0,1],
+                            [1,0,2,2,0,0,0,0,0,0,0,0,2,0,0,1],
+                            [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,2,2,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,2,2,0,0,0,0,0,0,2,0,0,0,1],
+                            [1,0,0,2,2,0,0,0,0,0,0,2,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,2,2,2,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,2,0,0,0,0,0,0,0,0,0,0,2,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                        ]
+                    },
+                    // Maze - Complex corridors
+                    maze: {
+                        name: 'Maze',
+                        description: 'Tight corridors and turns',
+                        floorColor: '#3d3d3d',
+                        skyColor: '#1a1a2e',
+                        map: [
+                            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                            [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],
+                            [1,0,1,0,1,0,1,1,1,1,0,1,0,1,0,1],
+                            [1,0,1,0,0,0,0,0,0,1,0,0,0,1,0,1],
+                            [1,0,1,1,1,1,1,1,0,1,1,1,0,1,0,1],
+                            [1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1],
+                            [1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
+                            [1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1],
+                            [1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,1],
+                            [1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1],
+                            [1,1,1,0,1,0,1,1,1,1,1,1,1,1,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                        ]
+                    }
+                };
+            }
+
+            setArena(arenaId) {
+                if (this.arenas[arenaId]) {
+                    this.currentArena = arenaId;
+                    this.map = this.arenas[arenaId].map;
+                    return true;
+                }
+                return false;
+            }
+
+            getArenaInfo() {
+                const arena = this.arenas[this.currentArena];
+                return {
+                    id: this.currentArena,
+                    name: arena.name,
+                    description: arena.description
+                };
+            }
+
+            setGameMode(mode) {
+                this.currentMode = mode;
+                const descriptions = {
+                    classic: 'Hit as many targets as possible within the time limit',
+                    flickShot: 'Targets appear briefly - react fast and flick to hit them',
+                    tracking: 'Follow moving targets smoothly for accurate hits',
+                    reaction: 'Test your reaction speed with sudden target appearances',
+                    precision: 'Hit smaller targets - accuracy is key',
+                    elimination: 'Clear all targets in each wave'
+                };
+                if (this.ui.modeDescription) {
+                    this.ui.modeDescription.textContent = descriptions[mode] || '';
+                }
+            }
+
+            getCurrentWaveConfig() {
+                const modeWaves = this.modeConfigs[this.currentMode];
+                if (!modeWaves) return { targets: 5, time: 30, pattern: 'floating' };
+                const waveIndex = Math.min(this.currentWave - 1, modeWaves.length - 1);
+                return modeWaves[waveIndex];
             }
             
             startGame() {
                 this.gameState = 'playing';
-                this.gameTime = 120;
                 this.score = 0;
                 this.isRunning = true;
                 this.spawnTimer = 0;
-                
+
+                // Reset wave system
+                this.currentWave = 1;
+                this.streakCount = 0;
+                this.maxStreak = 0;
+                this.scoreMultiplier = 1.0;
+                this.lastHitTime = 0;
+                this.roundStats = { targetsHit: 0, targetsMissed: 0, accuracy: 0, maxStreak: 0 };
+
                 // Reset player to dead center of map
-                this.player.x = 512; // Dead center of 16x16 map (8 * 64)
+                this.player.x = 512;
                 this.player.y = 512;
                 this.player.angle = 0;
                 this.player.pitch = 0;
-                
+
                 // Clear objects
                 this.circles = [];
                 this.npcs = [];
-                
-                // Spawn initial objects
-                this.spawnCircles(5);
-                this.spawnNPCs(3);
-                
+
                 // Update UI
                 this.showGameUI();
                 this.updateScore(this.score);
-                this.updateTimer(this.gameTime);
-                
+
                 // Request pointer lock
                 document.body.requestPointerLock();
-                
+
+                // Start with warmup phase
+                this.startWarmup(3);
+
                 // Start game loop
                 this.gameLoop();
-                
-                console.log('Game started');
+
+                console.log('Game started - Mode:', this.currentMode);
             }
-            
+
+            startWarmup(duration) {
+                this.isWarmingUp = true;
+                this.warmupTimeRemaining = duration;
+                this.showGameMessage('Get Ready!', '#ffff00');
+            }
+
+            startWave() {
+                const config = this.getCurrentWaveConfig();
+                this.waveTimeRemaining = config.time || 30;
+                this.gameTime = config.time || 30;
+                this.activePattern = config.pattern;
+                this.activeConfig = config;
+
+                // Update wave UI
+                this.updateWaveInfo();
+                this.updateTimer(this.waveTimeRemaining);
+
+                // Clear existing targets
+                this.circles = [];
+                this.npcs = [];
+
+                // Spawn targets based on wave config
+                const targetCount = Math.min(config.targets, this.maxCircles);
+                this.spawnCircles(targetCount);
+                this.spawnNPCs(Math.max(1, Math.floor(this.currentWave / 2)));
+
+                this.showGameMessage(`Wave ${this.currentWave}`, '#00ffff');
+                console.log(`Starting Wave ${this.currentWave}:`, config);
+            }
+
+            endWave() {
+                if (this.currentWave < this.maxWaves) {
+                    this.currentWave++;
+                    this.showGameMessage(`Wave ${this.currentWave - 1} Complete!`, '#00ff00');
+
+                    // Brief pause before next wave
+                    setTimeout(() => {
+                        this.startWarmup(3);
+                    }, 2000);
+                } else {
+                    this.endGame();
+                }
+            }
+
+            showGameMessage(text, color = '#ffffff') {
+                if (this.ui.gameMessage) {
+                    this.ui.gameMessage.textContent = text;
+                    this.ui.gameMessage.style.color = color;
+                    this.ui.gameMessage.style.opacity = '1';
+
+                    setTimeout(() => {
+                        this.ui.gameMessage.style.opacity = '0';
+                    }, 1500);
+                }
+            }
+
+            updateWaveInfo() {
+                if (this.ui.waveInfo) {
+                    this.ui.waveInfo.textContent = `Wave ${this.currentWave}/${this.maxWaves}`;
+                }
+            }
+
+            updateStreakInfo() {
+                if (this.ui.streakInfo) {
+                    if (this.streakCount >= 3) {
+                        this.ui.streakInfo.textContent = `Streak: ${this.streakCount}`;
+                        this.ui.streakInfo.style.display = 'block';
+                    } else {
+                        this.ui.streakInfo.style.display = 'none';
+                    }
+                }
+            }
+
+            updateMultiplierInfo() {
+                if (this.ui.multiplierInfo) {
+                    this.ui.multiplierInfo.textContent = `x${this.scoreMultiplier.toFixed(1)}`;
+                    if (this.scoreMultiplier > 1) {
+                        this.ui.multiplierInfo.style.color = this.scoreMultiplier >= 2 ? '#ff00ff' : '#ffff00';
+                    } else {
+                        this.ui.multiplierInfo.style.color = '#aaaaaa';
+                    }
+                }
+            }
+
+            updateScoreMultiplier() {
+                if (this.streakCount >= 10) {
+                    this.scoreMultiplier = 2.5;
+                } else if (this.streakCount >= 7) {
+                    this.scoreMultiplier = 2.0;
+                } else if (this.streakCount >= 5) {
+                    this.scoreMultiplier = 1.75;
+                } else if (this.streakCount >= 3) {
+                    this.scoreMultiplier = 1.5;
+                } else {
+                    this.scoreMultiplier = 1.0;
+                }
+            }
+
+            onTargetHit() {
+                this.streakCount++;
+                if (this.streakCount > this.maxStreak) {
+                    this.maxStreak = this.streakCount;
+                    this.roundStats.maxStreak = this.maxStreak;
+                }
+                this.lastHitTime = Date.now();
+                this.roundStats.targetsHit++;
+
+                this.updateScoreMultiplier();
+
+                // Calculate score with multiplier
+                const baseScore = 10;
+                const streakBonus = Math.min(this.streakCount * 2, 20);
+                const multipliedScore = Math.floor((baseScore + streakBonus) * this.scoreMultiplier);
+
+                // Show streak milestones
+                if (this.streakCount === 3) this.showGameMessage('Nice! x1.5', '#00ff00');
+                else if (this.streakCount === 5) this.showGameMessage('Great! x1.75', '#00ffff');
+                else if (this.streakCount === 7) this.showGameMessage('Excellent! x2.0', '#ffff00');
+                else if (this.streakCount === 10) this.showGameMessage('UNSTOPPABLE! x2.5', '#ff00ff');
+
+                return multipliedScore;
+            }
+
+            breakStreak() {
+                if (this.streakCount > 0) {
+                    this.streakCount = 0;
+                    this.scoreMultiplier = 1.0;
+                }
+            }
+
             endGame() {
                 this.gameState = 'ended';
                 this.isRunning = false;
@@ -380,7 +858,16 @@
                 this.ui.crosshair.classList.add('hidden');
                 this.ui.score.classList.add('hidden');
                 this.ui.timer.classList.add('hidden');
+                this.ui.waveInfo.classList.add('hidden');
+                this.ui.streakInfo.classList.add('hidden');
+                this.ui.multiplierInfo.classList.add('hidden');
                 document.body.classList.remove('game-playing');
+
+                // Clean up stats div from end screen
+                const statsDiv = document.getElementById('endStats');
+                if (statsDiv) {
+                    statsDiv.textContent = '';
+                }
             }
             
             showGameUI() {
@@ -389,6 +876,8 @@
                 this.ui.crosshair.classList.add('hidden'); // Hide HTML crosshair, use canvas one
                 this.ui.score.classList.remove('hidden');
                 this.ui.timer.classList.remove('hidden');
+                this.ui.waveInfo.classList.remove('hidden');
+                this.ui.multiplierInfo.classList.remove('hidden');
                 document.body.classList.add('game-playing');
             }
             
@@ -398,9 +887,40 @@
                 this.ui.crosshair.classList.add('hidden');
                 this.ui.score.classList.add('hidden');
                 this.ui.timer.classList.add('hidden');
+                this.ui.waveInfo.classList.add('hidden');
+                this.ui.streakInfo.classList.add('hidden');
+                this.ui.multiplierInfo.classList.add('hidden');
                 document.body.classList.remove('game-playing');
-                
+
+                // Calculate accuracy
+                const totalShots = this.roundStats.targetsHit + this.roundStats.targetsMissed;
+                const accuracy = totalShots > 0 ? Math.round((this.roundStats.targetsHit / totalShots) * 100) : 0;
+                const modeName = this.currentMode.charAt(0).toUpperCase() + this.currentMode.slice(1);
+
                 this.ui.finalScore.textContent = `Final Score: ${score}`;
+
+                // Create stats display
+                let statsDiv = document.getElementById('endStats');
+                if (!statsDiv) {
+                    statsDiv = document.createElement('div');
+                    statsDiv.id = 'endStats';
+                    statsDiv.style.cssText = 'font-size: 16px; color: #aaa; margin-top: 15px;';
+                    this.ui.finalScore.parentNode.insertBefore(statsDiv, this.ui.finalScore.nextSibling);
+                }
+                statsDiv.textContent = '';
+                const lines = [
+                    `Mode: ${modeName}`,
+                    `Waves Completed: ${this.currentWave}/${this.maxWaves}`,
+                    `Targets Hit: ${this.roundStats.targetsHit}`,
+                    `Best Streak: ${this.maxStreak}`,
+                    `Accuracy: ${accuracy}%`
+                ];
+                lines.forEach(line => {
+                    const p = document.createElement('p');
+                    p.style.margin = '5px 0';
+                    p.textContent = line;
+                    statsDiv.appendChild(p);
+                });
             }
             
             updateScore(score) {
@@ -429,36 +949,148 @@
             }
             
             update(deltaTime) {
+                // Handle warmup phase
+                if (this.isWarmingUp) {
+                    this.warmupTimeRemaining -= deltaTime;
+
+                    // Show countdown
+                    const countdown = Math.ceil(this.warmupTimeRemaining);
+                    if (countdown > 0 && countdown !== this._lastCountdown) {
+                        this.showGameMessage(String(countdown), '#ffff00');
+                        this._lastCountdown = countdown;
+                    }
+
+                    if (this.warmupTimeRemaining <= 0) {
+                        this.isWarmingUp = false;
+                        this._lastCountdown = null;
+                        this.showGameMessage('GO!', '#00ff00');
+                        this.startWave();
+                    }
+                    return;
+                }
+
                 // Update player movement
                 this.updatePlayer(deltaTime);
-                
+
                 // Update game objects
                 this.updateCircles(deltaTime);
                 this.updateNPCs(deltaTime);
-                
-                // Update spawn timer
-                this.spawnTimer += deltaTime;
-                if (this.spawnTimer >= 30) {
-                    this.spawnCircles(2);
-                    this.spawnTimer = 0;
+
+                // Apply target patterns
+                this.applyTargetPatterns(deltaTime);
+
+                // Update streak timeout
+                if (this.streakCount > 0 && Date.now() - this.lastHitTime > this.streakTimeout) {
+                    this.breakStreak();
                 }
-                
-                // Update game timer
-                this.gameTime -= deltaTime;
-                this.updateTimer(Math.max(0, this.gameTime));
-                
-                if (this.gameTime <= 0) {
-                    this.endGame();
+
+                // Update streak and multiplier UI
+                this.updateStreakInfo();
+                this.updateMultiplierInfo();
+
+                // Update wave timer
+                this.waveTimeRemaining -= deltaTime;
+                this.gameTime = this.waveTimeRemaining;
+                this.updateTimer(Math.max(0, this.waveTimeRemaining));
+
+                if (this.waveTimeRemaining <= 0) {
+                    this.endWave();
                 }
-                
+
                 // Debug info
-                this.ui.debug.innerHTML = `
-                    Player: (${this.player.x.toFixed(1)}, ${this.player.y.toFixed(1)})<br>
-                    Angle: ${(this.player.angle * 180 / Math.PI).toFixed(1)}°<br>
-                    Pitch: ${(this.player.pitch * 180 / Math.PI).toFixed(1)}°<br>
-                    Circles: ${this.circles.length}<br>
-                    NPCs: ${this.npcs.length}
-                `;
+                this.ui.debug.textContent = `Wave ${this.currentWave} | Streak: ${this.streakCount} | x${this.scoreMultiplier.toFixed(1)}`;
+            }
+
+            applyTargetPatterns(deltaTime) {
+                if (!this.activePattern) return;
+
+                const patternConfig = this.targetPatterns[this.activePattern];
+                if (!patternConfig) return;
+
+                this.circles.forEach(circle => {
+                    switch (patternConfig.movement) {
+                        case 'strafe':
+                            this.applyStrafeMovement(circle, deltaTime);
+                            break;
+                        case 'erratic':
+                            this.applyErraticMovement(circle, deltaTime);
+                            break;
+                        case 'orbit':
+                            this.applyOrbitalMovement(circle, deltaTime);
+                            break;
+                        case 'popup':
+                            this.applyPopupBehavior(circle, deltaTime);
+                            break;
+                    }
+                });
+            }
+
+            applyStrafeMovement(circle, deltaTime) {
+                if (!circle.strafeData) {
+                    circle.strafeData = {
+                        direction: Math.random() > 0.5 ? 1 : -1,
+                        speed: 30 + Math.random() * 20,
+                        startX: circle.x
+                    };
+                }
+                circle.x += circle.strafeData.direction * circle.strafeData.speed * deltaTime;
+                if (Math.abs(circle.x - circle.strafeData.startX) > 100) {
+                    circle.strafeData.direction *= -1;
+                }
+            }
+
+            applyErraticMovement(circle, deltaTime) {
+                if (!circle.erraticData) {
+                    circle.erraticData = {
+                        changeTimer: 0,
+                        velocityX: 0,
+                        velocityY: 0
+                    };
+                }
+                circle.erraticData.changeTimer -= deltaTime;
+                if (circle.erraticData.changeTimer <= 0) {
+                    circle.erraticData.velocityX = (Math.random() - 0.5) * 80;
+                    circle.erraticData.velocityY = (Math.random() - 0.5) * 80;
+                    circle.erraticData.changeTimer = 0.5 + Math.random() * 0.5;
+                }
+                circle.x += circle.erraticData.velocityX * deltaTime;
+                circle.y += circle.erraticData.velocityY * deltaTime;
+            }
+
+            applyOrbitalMovement(circle, deltaTime) {
+                if (!circle.orbitData) {
+                    circle.orbitData = {
+                        centerX: circle.x,
+                        centerY: circle.y,
+                        radius: 40 + Math.random() * 40,
+                        angle: Math.random() * Math.PI * 2,
+                        speed: 1 + Math.random()
+                    };
+                }
+                circle.orbitData.angle += circle.orbitData.speed * deltaTime;
+                circle.x = circle.orbitData.centerX + Math.cos(circle.orbitData.angle) * circle.orbitData.radius;
+                circle.y = circle.orbitData.centerY + Math.sin(circle.orbitData.angle) * circle.orbitData.radius;
+            }
+
+            applyPopupBehavior(circle, deltaTime) {
+                if (!circle.popupData) {
+                    const lifetime = this.activeConfig && this.activeConfig.targetLifetime ? this.activeConfig.targetLifetime : 2.0;
+                    circle.popupData = {
+                        lifetime: lifetime,
+                        timeAlive: 0
+                    };
+                }
+                circle.popupData.timeAlive += deltaTime;
+                if (circle.popupData.timeAlive >= circle.popupData.lifetime) {
+                    // Remove and respawn
+                    const idx = this.circles.indexOf(circle);
+                    if (idx > -1) {
+                        this.circles.splice(idx, 1);
+                        this.roundStats.targetsMissed++;
+                        // Spawn a new one
+                        this.spawnCircles(1);
+                    }
+                }
             }
             
             updatePlayer(deltaTime) {
@@ -653,20 +1285,24 @@
                 // Hit the closest object
                 if (objectsInRange.length > 0) {
                     const hit = objectsInRange[0];
-                    
+
                     if (hit.type === 'circle') {
-                        this.score += 10;
+                        // Use new scoring with multiplier
+                        const points = this.onTargetHit();
+                        this.score += points;
                         this.updateScore(this.score);
                         this.circles.splice(hit.index, 1);
-                        this.showMessage('+10 Points!', '#00FF00');
-                        console.log('Hit circle! Score:', this.score);
+                        this.showMessage(`+${points}`, '#00FF00');
+                        console.log('Hit circle! Score:', this.score, 'Streak:', this.streakCount);
                     } else if (hit.type === 'npc') {
                         this.score -= 1;
                         this.updateScore(this.score);
+                        this.breakStreak();
                         this.showMessage('-1 Point', '#FF0000');
                         console.log('Hit NPC! Score:', this.score);
                     }
                 } else {
+                    this.breakStreak();
                     this.showMessage('Miss!', '#888888');
                 }
             }
@@ -714,11 +1350,12 @@
                 // Calculate horizon line based on pitch
                 const horizon = this.canvas.height / 2 + (this.player.pitch / (Math.PI / 2)) * (this.canvas.height / 4);
                 
-                // Draw floor and ceiling with pitch
-                this.ctx.fillStyle = '#654321'; // Brown floor
+                // Draw floor and ceiling with pitch using arena-specific colors
+                const arena = this.arenas[this.currentArena];
+                this.ctx.fillStyle = arena ? arena.floorColor : '#654321';
                 this.ctx.fillRect(0, horizon, this.canvas.width, this.canvas.height - horizon);
-                
-                this.ctx.fillStyle = '#87CEEB'; // Sky ceiling
+
+                this.ctx.fillStyle = arena ? arena.skyColor : '#87CEEB';
                 this.ctx.fillRect(0, 0, this.canvas.width, horizon);
                 
                 for (let i = 0; i < rayCount; i++) {
@@ -1073,7 +1710,43 @@
                 game.restartGame();
             }
         }
-        
+
+        function selectMode(mode) {
+            if (game) {
+                game.setGameMode(mode);
+
+                // Update button styles
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                const selectedBtn = document.getElementById('mode-' + mode);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('active');
+                }
+            }
+        }
+
+        function selectArena(arenaId) {
+            if (game && game.arenas[arenaId]) {
+                game.setArena(arenaId);
+
+                // Update button styles
+                document.querySelectorAll('.arena-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                const selectedBtn = document.getElementById('arena-' + arenaId);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('active');
+                }
+
+                // Update description
+                const descEl = document.getElementById('arenaDescription');
+                if (descEl) {
+                    descEl.textContent = game.arenas[arenaId].description;
+                }
+            }
+        }
+
         // Initialize game when page loads
         window.addEventListener('load', () => {
             try {

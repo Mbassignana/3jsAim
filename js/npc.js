@@ -6,7 +6,12 @@ class NPCManager {
         this.sceneManager = sceneManager;
         this.npcs = [];
         this.maxNPCs = 8;
-        
+
+        // Occlusion culling
+        this.occlusionRaycaster = new THREE.Raycaster();
+        this.camera = null;
+        this.occlusionObjects = [];
+
         // NPC types with different models and behaviors
         this.npcTypes = [
             {
@@ -38,6 +43,65 @@ class NPCManager {
     init() {
         // Pre-create geometries for different NPC types
         this.createNPCGeometries();
+    }
+
+    // Set camera reference for occlusion culling
+    setCamera(camera) {
+        this.camera = camera;
+    }
+
+    // Build occlusion objects from scene
+    buildOcclusionList() {
+        this.occlusionObjects = [];
+        this.scene.traverse((object) => {
+            if (object.isMesh &&
+                (object.userData.type === 'building' ||
+                 object.userData.type === 'wall' ||
+                 object.userData.type === 'prop')) {
+                this.occlusionObjects.push(object);
+            }
+        });
+    }
+
+    // Check if an NPC is visible from the camera
+    isNPCVisible(npc) {
+        if (!this.camera) return true;
+
+        // Get NPC center position (accounting for height)
+        const npcCenter = npc.position.clone();
+        npcCenter.y += 0.5; // Approximate center height
+
+        // Direction from camera to NPC
+        const direction = new THREE.Vector3();
+        direction.subVectors(npcCenter, this.camera.position).normalize();
+
+        // Distance from camera to NPC
+        const distanceToNPC = this.camera.position.distanceTo(npcCenter);
+
+        // Set up raycaster
+        this.occlusionRaycaster.set(this.camera.position, direction);
+        this.occlusionRaycaster.far = distanceToNPC;
+
+        // Check for intersections with occluding objects
+        const intersects = this.occlusionRaycaster.intersectObjects(this.occlusionObjects, true);
+
+        for (const hit of intersects) {
+            if (hit.distance < distanceToNPC - 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Update visibility of all NPCs based on occlusion
+    updateOcclusion() {
+        if (!this.camera || this.occlusionObjects.length === 0) return;
+
+        for (const npc of this.npcs) {
+            npc.visible = this.isNPCVisible(npc);
+            npc.userData.occluded = !npc.visible;
+        }
     }
     
     createNPCGeometries() {
@@ -170,6 +234,9 @@ class NPCManager {
     }
     
     update(deltaTime) {
+        // Update occlusion visibility first
+        this.updateOcclusion();
+
         this.npcs.forEach(npc => {
             this.updateNPCBehavior(npc, deltaTime);
             this.updateNPCAnimation(npc, deltaTime);
